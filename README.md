@@ -1,0 +1,1 @@
+# adswipe.js
