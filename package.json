@@ -1,0 +1,23 @@
+{
+  "name": "adswipejs",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Adswipe/adswipe.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Adswipe/adswipe.js"
+  },
+  "main": "./dist/adswipe.min.js",
+  "engines": {
+    "node": ">=0.10"
+  },
+  "devDependencies": {
+    "babel-core": "^5.6.15",
+    "babel-loader": "^5.3.1",
+    "bower": "*",
+    "gulp-if-else": "^1.0.3",
+    "gulp-notify": "^2.2.0",
+    "node-libs-browser": "^0.5.2",
+    "webpack": "^1.10.1",
+    "webpack-stream": "^2.0.0"
+  }
+}

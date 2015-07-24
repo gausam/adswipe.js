@@ -1,0 +1,18 @@
+{
+  "name": "adswipe-test-manual",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Adswipe/adswipe.js",
+  "authors": [
+    "Dave Rogers <redcore@gmail.com>"
+  ],
+  "main": "adswipe.js",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "requirejs": "~2.1.18",
+    "jquery": "~2.1.4",
+    "ua-parser-js": "~0.7.7"
+  }
+}

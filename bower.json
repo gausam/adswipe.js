@@ -1,0 +1,24 @@
+{
+    "name": "adswipejs",
+    "version": "0.0.1",
+    "main": "dist/adswipe.min.js",
+    "dependencies": {},
+    "ignore": [
+        "*",
+        "!dist/",
+        "!dist/*"
+    ],
+    "moduleType": [
+        "amd",
+        "node",
+        "globals"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Adswipe/adswipe.js.git"
+    },
+    "devDependencies": {
+        "hammerjs": "~2",
+        "fingerprintjs2": "~0.5.1"
+    }
+}
