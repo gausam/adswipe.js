@@ -10,88 +10,108 @@ class Ajax {
         else
             this.req = new ActiveXObject("Microsoft.XMLHTTP");
     }
-    get(callback) {
+    get() {
         var $ = this;           // shorthand 'this'
         var req = this.req;
         var method = 'GET';
 
-        if(!$.url)
-            return 'No URL Set';
+        return new Promise(function(resolve, reject) {
+            if(!$.url)
+                reject(Error('No URL Set'));
 
-        if( typeof $.data !== 'undefined' && $.data !== null )
-            $.url = $.url+'?'+$.data;
+            if( typeof $.data !== 'undefined' && $.data !== null )
+                $.url = $.url+'?'+$.data;
 
-        req.open(method, $.url, $.async);
-        req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        req.onload = function(event) {
-            if( this.status == 200 ) {
-                $.response = JSON.parse(this.responseText);
-                // execute callback, if set
-                $._done(callback);
-            }
-        };
-        req.send();
+            req.open(method, $.url, $.async);
+            req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            req.onload = function(event) {
+                if( this.status == 200 ) {
+                    $.response = JSON.parse(this.responseText);
+                    resolve($.response);
+                } else {
+                    reject(Error(this.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function() {
+                reject(Error("Network Error"));
+            };
+
+            req.send();
+        });
     }
-    getImage(callback) {
+    getImage() {
         // NOTE: likely will need to use BinaryJS for video blob streaming - http://binaryjs.com/
         var $ = this;           // shorthand 'this'
         var req = this.req;
         var method = 'GET';
 
-        if(!this.url)
-            return 'No URL Set';
+        return new Promise(function(resolve, reject) {
+            if(!$.url)
+                reject(Error('No URL Set'));
 
-        req.open(method, $.url, $.async);
-        req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        req.onload = function(event) {
-            if( this.status == 200 ) {
-                var response = JSON.parse(this.response);
-                var blob = b64toBlob(response.blob, response.type);
-                var urlCreator = window.URL || window.webkitURL;
+            req.open(method, $.url, $.async);
+            req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            req.onload = function(event) {
+                if( this.status == 200 ) {
+                    var response = JSON.parse(this.response);
+                    var blob = b64toBlob(response.blob, response.type);
+                    var urlCreator = window.URL || window.webkitURL;
 
-                $.response = {
-                    blob: blob,
-                    imageURL: urlCreator.createObjectURL( blob ),
-                    clickURL: response.clickURL,
-                    adID: response.adID
-                };
+                    $.response = {
+                        blob: blob,
+                        imageURL: urlCreator.createObjectURL( blob ),
+                        clickURL: response.clickURL,
+                        adID: response.adID
+                    };
 
-                // execute callback, if set
-                $._done(callback);
-            }
-        };
-        req.send();
+                    resolve($.response);
+                } else {
+                    reject(Error(this.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function() {
+                reject(Error("Network Error"));
+            };
+
+            req.send();
+        });
     }
-    post(data, callback) {
+    post(data) {
         var $ = this;           // shorthand 'this'
         var req = this.req;
         var method = 'POST';
 
-        req.open(method, $.url, $.async);
-        req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        req.onload = function(event) {
-            if( this.status == 200 ) {
-                $.response = JSON.parse(this.responseText);
-                // execute callback, if set
-                $._done(callback);
-            }
-        };
-        req.send(JSON.stringify(data));
-    }
-    _done(callback) {
-        var $ = this;
+        return new Promise(function(resolve, reject) {
+            if(!$.url)
+                reject(Error('No URL Set'));
 
-        if( typeof callback === 'function') {
-            callback($.response);
-        } else {
-            return true;
-        }
+            req.open(method, $.url, $.async);
+            req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            req.onload = function(event) {
+                if( this.status == 200 ) {
+                    $.response = JSON.parse(this.responseText);
+                    resolve($.response);
+                } else {
+                    reject(Error(this.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function() {
+                reject(Error("Network Error"));
+            };
+
+            req.send(JSON.stringify(data));
+        });
     }
 }
 
 export default Ajax;
-
 
 function b64toBlob(b64Data, contentType, sliceSize) {
     contentType = contentType || '';

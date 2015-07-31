@@ -18,6 +18,17 @@ function   ($,        adswipe,   UAParser) {
     adswipe.endpoint('http://api.adswipe.dev.192.168.1.117.xip.io');
 
     $('.as-init').on('click', function(){
+        /* get adswipejs version */
+        //adswipe.apiVersion();
+
+        /* get api version */
+        // adswipe.apiVersion().then(function(data) {
+        //     console.log(data);
+        // }, function(error){
+        //     console.log(error);
+        // });
+
+        /* show ad */
         //adswipe.show(); // enter campaign ID, ie 'CXLdEmaygJZWeVKw5cMW'
     });
 

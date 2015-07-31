@@ -63,6 +63,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.endpoint = endpoint;
 	exports.debug = debug;
 	exports.version = version;
+	exports.apiVersion = apiVersion;
 	exports.show = show;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -128,6 +129,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	/**
+	 * Return API version number (promise)
+	 * @return string       api version number
+	 */
+
+	function apiVersion() {
+	    // basically wrap api.get() promise in a promise
+	    return new Promise(function (resolve, reject) {
+	        var api = new _utilAjaxJs2['default']();
+	        api.url = config.endpoint + 'version';
+	        api.get().then(function (response) {
+	            resolve(response);
+	        }, function (error) {
+	            reject(error);
+	        });
+	    });
+	}
+
+	/**
 	 * Set up and display new ad
 	 * @param  {int} campaignID     campaign ID hash
 	 */
@@ -167,7 +186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Config() {
 	        _classCallCheck(this, Config);
 
-	        this._version = '0.0.1';
+	        this._version = '0.1.0';
 	        this._endpoint = 'http://adswipe.com/';
 	        this._debug = false;
 	        this._fingerprint = null;
@@ -1556,8 +1575,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // get image, append to hammer element
 	            var image = new _utilAjaxJs2['default']();
 	            image.url = $.config.endpoint + ('campaigns/' + campaignID);
-	            image.getImage(function (response) {
-
+	            image.getImage().then(function (response) {
+	                // everything is good
 	                $.config.clickURL = response.clickURL;
 	                $.config.adID = response.adID;
 	                /** add debug data to div if in debug mode
@@ -1589,10 +1608,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.el.style.position = 'fixed';
 	                $.el.style.top = 0 + 'px';
 	                $.el.style.zIndex = $.config.zIndex; // make sure this is on top of other elements
-	                $.el.style.backgroundColor = 'rgba(2, 142, 183, 1)'; // just in case the image isn't big enough
+	                $.el.style.backgroundColor = 'rgba(0, 0, 0, .85)'; // just in case the image isn't big enough
 
 	                // hammerjs
 	                $.resetElement();
+	            }, function (error) {
+	                $.logEvent('Error: Unable to get image');
+	                $.logEvent(error);
+	                return false;
 	            });
 	        }
 	    }, {
@@ -1642,7 +1665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'requestElementUpdate',
 	        value: function requestElementUpdate() {
-	            $ = this;
+	            var $ = this;
 	            if (!$.ticking) {
 	                reqAnimationFrame($.updateElementTransform.bind(this));
 	                $.ticking = true;
@@ -1651,6 +1674,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'logEvent',
 	        value: function logEvent(str) {
+	            var $ = this;
 	            if ($.config.debug) console.log(str);
 	        }
 	    }, {
@@ -1727,14 +1751,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                'impressed_user': $.config.fingerprint,
 	                'ad_id': $.config.adID
 	            };
-	            update.post(data, function (response) {
+	            update.post(data).then(function (response) {
 	                // unbind events (must include callback function originally used)
-	                $.mc.off('swipeleft swiperight', _this.onSwipe.bind(_this));
-	                $.mc.off('panleft panright panend', _this.onPan.bind(_this));
-	                $.mc.off('tap', _this.onTap.bind(_this));
+	                $.mc.off('swipeleft swiperight', $.onSwipe.bind(_this));
+	                $.mc.off('panleft panright panend', $.onPan.bind(_this));
+	                $.mc.off('tap', $.onTap.bind(_this));
 
 	                // destroy hammer instance
-	                _this.mc.destroy();
+	                $.mc.destroy();
 
 	                // destroy element
 	                $.el.outerHTML = '';
@@ -4251,86 +4275,104 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _createClass(Ajax, [{
 	        key: 'get',
-	        value: function get(callback) {
+	        value: function get() {
 	            var $ = this; // shorthand 'this'
 	            var req = this.req;
 	            var method = 'GET';
 
-	            if (!$.url) return 'No URL Set';
+	            return new Promise(function (resolve, reject) {
+	                if (!$.url) reject(Error('No URL Set'));
 
-	            if (typeof $.data !== 'undefined' && $.data !== null) $.url = $.url + '?' + $.data;
+	                if (typeof $.data !== 'undefined' && $.data !== null) $.url = $.url + '?' + $.data;
 
-	            req.open(method, $.url, $.async);
-	            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-	            req.onload = function (event) {
-	                if (this.status == 200) {
-	                    $.response = JSON.parse(this.responseText);
-	                    // execute callback, if set
-	                    $._done(callback);
-	                }
-	            };
-	            req.send();
+	                req.open(method, $.url, $.async);
+	                req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	                req.onload = function (event) {
+	                    if (this.status == 200) {
+	                        $.response = JSON.parse(this.responseText);
+	                        resolve($.response);
+	                    } else {
+	                        reject(Error(this.statusText));
+	                    }
+	                };
+
+	                // Handle network errors
+	                req.onerror = function () {
+	                    reject(Error('Network Error'));
+	                };
+
+	                req.send();
+	            });
 	        }
 	    }, {
 	        key: 'getImage',
-	        value: function getImage(callback) {
+	        value: function getImage() {
 	            // NOTE: likely will need to use BinaryJS for video blob streaming - http://binaryjs.com/
 	            var $ = this; // shorthand 'this'
 	            var req = this.req;
 	            var method = 'GET';
 
-	            if (!this.url) return 'No URL Set';
+	            return new Promise(function (resolve, reject) {
+	                if (!$.url) reject(Error('No URL Set'));
 
-	            req.open(method, $.url, $.async);
-	            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-	            req.onload = function (event) {
-	                if (this.status == 200) {
-	                    var response = JSON.parse(this.response);
-	                    var blob = b64toBlob(response.blob, response.type);
-	                    var urlCreator = window.URL || window.webkitURL;
+	                req.open(method, $.url, $.async);
+	                req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	                req.onload = function (event) {
+	                    if (this.status == 200) {
+	                        var response = JSON.parse(this.response);
+	                        var blob = b64toBlob(response.blob, response.type);
+	                        var urlCreator = window.URL || window.webkitURL;
 
-	                    $.response = {
-	                        blob: blob,
-	                        imageURL: urlCreator.createObjectURL(blob),
-	                        clickURL: response.clickURL,
-	                        adID: response.adID
-	                    };
+	                        $.response = {
+	                            blob: blob,
+	                            imageURL: urlCreator.createObjectURL(blob),
+	                            clickURL: response.clickURL,
+	                            adID: response.adID
+	                        };
 
-	                    // execute callback, if set
-	                    $._done(callback);
-	                }
-	            };
-	            req.send();
+	                        resolve($.response);
+	                    } else {
+	                        reject(Error(this.statusText));
+	                    }
+	                };
+
+	                // Handle network errors
+	                req.onerror = function () {
+	                    reject(Error('Network Error'));
+	                };
+
+	                req.send();
+	            });
 	        }
 	    }, {
 	        key: 'post',
-	        value: function post(data, callback) {
+	        value: function post(data) {
 	            var $ = this; // shorthand 'this'
 	            var req = this.req;
 	            var method = 'POST';
 
-	            req.open(method, $.url, $.async);
-	            req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-	            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-	            req.onload = function (event) {
-	                if (this.status == 200) {
-	                    $.response = JSON.parse(this.responseText);
-	                    // execute callback, if set
-	                    $._done(callback);
-	                }
-	            };
-	            req.send(JSON.stringify(data));
-	        }
-	    }, {
-	        key: '_done',
-	        value: function _done(callback) {
-	            var $ = this;
+	            return new Promise(function (resolve, reject) {
+	                if (!$.url) reject(Error('No URL Set'));
 
-	            if (typeof callback === 'function') {
-	                callback($.response);
-	            } else {
-	                return true;
-	            }
+	                req.open(method, $.url, $.async);
+	                req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	                req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	                req.onload = function (event) {
+	                    if (this.status == 200) {
+	                        $.response = JSON.parse(this.responseText);
+	                        resolve($.response);
+	                    } else {
+	                        reject(Error(this.statusText));
+	                    }
+	                };
+
+	                // Handle network errors
+	                req.onerror = function () {
+	                    reject(Error('Network Error'));
+	                };
+
+	                req.send(JSON.stringify(data));
+	            });
 	        }
 	    }]);
 

@@ -46,6 +46,23 @@ export function version() {
 }
 
 /**
+ * Return API version number (promise)
+ * @return string       api version number
+ */
+export function apiVersion() {
+    // basically wrap api.get() promise in a promise
+    return new Promise((resolve, reject) => {
+        var api = new Ajax();
+        api.url = config.endpoint+`version`;
+        api.get().then((response) => {
+            resolve(response);
+        }, function(error){
+            reject(error);
+        });
+    });
+}
+
+/**
  * Set up and display new ad
  * @param  {int} campaignID     campaign ID hash
  */

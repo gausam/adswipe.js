@@ -62,8 +62,8 @@ class HammerAS {
         // get image, append to hammer element
         var image = new Ajax();
         image.url = $.config.endpoint+`campaigns/${campaignID}`;
-        image.getImage((response) => {
-
+        image.getImage().then((response) => {
+            // everything is good
             $.config.clickURL = response.clickURL;
             $.config.adID = response.adID;
             /** add debug data to div if in debug mode
@@ -100,10 +100,14 @@ class HammerAS {
             $.el.style.position = 'fixed';
             $.el.style.top = 0 + 'px';
             $.el.style.zIndex = $.config.zIndex;                    // make sure this is on top of other elements
-            $.el.style.backgroundColor = 'rgba(2, 142, 183, 1)';    // just in case the image isn't big enough
+            $.el.style.backgroundColor = 'rgba(0, 0, 0, .85)';    // just in case the image isn't big enough
 
             // hammerjs
             $.resetElement();
+        }, function(error){
+            $.logEvent('Error: Unable to get image');
+            $.logEvent(error);
+            return false;
         });
     }
 
@@ -153,7 +157,7 @@ class HammerAS {
     }
 
     requestElementUpdate() {
-        $ = this;
+        var $ = this;
         if (!$.ticking) {
             reqAnimationFrame( $.updateElementTransform.bind(this) );
             $.ticking = true;
@@ -161,6 +165,7 @@ class HammerAS {
     }
 
     logEvent(str) {
+        var $ = this;
         if( $.config.debug )
             console.log(str);
     }
@@ -233,14 +238,14 @@ class HammerAS {
             'impressed_user': $.config.fingerprint,
             'ad_id': $.config.adID
         };
-        update.post(data, (response) => {
+        update.post(data).then((response) => {
             // unbind events (must include callback function originally used)
-            $.mc.off("swipeleft swiperight", this.onSwipe.bind(this));
-            $.mc.off("panleft panright panend", this.onPan.bind(this));
-            $.mc.off("tap", this.onTap.bind(this));
+            $.mc.off("swipeleft swiperight", $.onSwipe.bind(this));
+            $.mc.off("panleft panright panend", $.onPan.bind(this));
+            $.mc.off("tap", $.onTap.bind(this));
 
             // destroy hammer instance
-            this.mc.destroy();
+            $.mc.destroy();
 
             // destroy element
             $.el.outerHTML = "";

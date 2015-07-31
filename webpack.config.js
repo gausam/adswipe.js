@@ -14,7 +14,8 @@ module.exports = {
         },
         modulesDirectories: [
             'src',
-            'bower_commponents'
+            'bower_commponents',
+            'node_modules'
         ]
     },
     output: {
