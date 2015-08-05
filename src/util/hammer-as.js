@@ -1,6 +1,7 @@
 /*jshint esnext: true */
 import Hammer from 'hammer';
 import Ajax from 'util/ajax.js';
+import UAParser from 'uaparser';
 
 class HammerAS {
     constructor(config) {
@@ -17,6 +18,9 @@ class HammerAS {
         this.ticking = false;
         this.transform = null;
         this.timer = null;
+
+        this.ua = new UAParser();
+        console.log(this.ua.getResult());
 
         // add 'adswipe' div node
         var classname = this.config.classElement;
@@ -81,6 +85,7 @@ class HammerAS {
                                     <li ${styleData}>${$.width} x ${$.height}
                                     <li ${styleTitle}>User Fingerprint
                                     <li ${styleData}>${$.config.fingerprint}
+                                    <li style="display: inline;">${$.ua.getUA()}
                                 </ul>`;
                 //$.el.innerHTML = $.width+' x '+$.height+'<br>'+$.config.fingerprint;
                 $.el.innerHTML = debugData;
@@ -188,7 +193,6 @@ class HammerAS {
 
         $.requestElementUpdate();
 
-
         $.logEvent(ev.type);
     }
 
@@ -209,6 +213,15 @@ class HammerAS {
         $.logEvent(ev.type);
         $.sendAction(ev.type);
     }
+
+    // onTap(ev) {
+    //     var $ = this;
+    //
+    //     Velocity(document.body, { opacity: 0.5 });
+    //
+    //     $.logEvent(ev.type);
+    //     return;
+    // }
 
     onTap(ev) {
         var $ = this;
@@ -236,7 +249,18 @@ class HammerAS {
             'action': action,
             'cid': $.config.campaignID,
             'impressed_user': $.config.fingerprint,
-            'ad_id': $.config.adID
+            'ad_id': $.config.adID,
+            'browser_name': $.ua.getBrowser().name,
+            'browser_version': $.ua.getBrowser().version,
+            'device_model': $.ua.getDevice().model,
+            'device_type': $.ua.getDevice().type,
+            'device_vendor': $.ua.getDevice().vendor,
+            'engine_name': $.ua.getEngine().name,
+            'engine_version': $.ua.getEngine().version,
+            'os_name': $.ua.getOS().name,
+            'os_version': $.ua.getOS().version,
+            'cpu': $.ua.getCPU().architecture,
+            'user_agent': $.ua.getUA()
         };
         update.post(data).then((response) => {
             // unbind events (must include callback function originally used)

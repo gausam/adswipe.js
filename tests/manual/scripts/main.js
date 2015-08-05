@@ -19,7 +19,7 @@ function   ($,        adswipe,   UAParser) {
 
     $('.as-init').on('click', function(){
         /* get adswipejs version */
-        //adswipe.apiVersion();
+        //console.log(adswipe.version());
 
         /* get api version */
         // adswipe.apiVersion().then(function(data) {
@@ -29,7 +29,7 @@ function   ($,        adswipe,   UAParser) {
         // });
 
         /* show ad */
-        //adswipe.show(); // enter campaign ID, ie 'CXLdEmaygJZWeVKw5cMW'
+        adswipe.show('ZTHQK2mio4zUi74fj7Nw'); // enter campaign ID, ie 'ZTHQK2mio4zUi74fj7Nw'
     });
 
     //var parser = new UAParser();
