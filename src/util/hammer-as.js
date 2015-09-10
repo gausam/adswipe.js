@@ -2,14 +2,17 @@
 import Hammer from 'hammer';
 import Ajax from 'util/ajax.js';
 import UAParser from 'uaparser';
+import Util from 'util/util.js';
 
 class HammerAS {
     constructor(config) {
         this.config = config;
+        this.util = new Util(config);
 
         this.width = document.documentElement.clientWidth;
         this.height = document.documentElement.clientHeight;
-        this.el = null;
+        this.ad = null;
+        this.bg = null;
         this.mc = null;
 
         this.start_x = 0;
@@ -20,16 +23,19 @@ class HammerAS {
         this.timer = null;
 
         this.ua = new UAParser();
-        console.log(this.ua.getResult());
 
         // add 'adswipe' div node
-        var classname = this.config.classElement;
-        this.el = document.createElement('div');
-        this.el.setAttribute("class", classname);
-        document.body.appendChild(this.el);
+        this.ad = document.createElement('div');
+        this.ad.setAttribute("class", this.config.classElement);
+        document.body.appendChild(this.ad);
+
+        // add semi-transparent black bg (will be under ad)
+        this.bg = document.createElement('div');
+        this.bg.setAttribute("class", this.config.classElement+'_bg');
+        document.body.appendChild(this.bg);
 
         // set up hammerjs
-        this.mc = new Hammer.Manager(this.el);
+        this.mc = new Hammer.Manager(this.ad);
         this.mc.add(new Hammer.Pan());
         this.mc.add(new Hammer.Swipe({
             threshold: 5,
@@ -51,25 +57,40 @@ class HammerAS {
      * Show ad
      * @return {[type]} [description]
      */
-    show(campaignID) {
+    show(asid) {
         var $ = this;
 
         // if Adswipe element removed, action has already been taken on this capaign, do not repeat
-        if( !$.el )
+        if( !$.ad )
             return false;
 
-        $.config.campaignID = campaignID;
+        $.config.asid = asid;
 
         $.width = document.documentElement.clientWidth;
         $.height = document.documentElement.clientHeight;
 
+        // add semi-transparent background style to bg element
+        $.bg.style.transition = 'all .3s';
+        $.bg.style.width = $.width + 'px';
+        $.bg.style.height = $.height + 'px';
+        $.bg.style.position = 'fixed';
+        $.bg.style.top = 0 + 'px';
+        $.bg.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements, ad will be placed on top of this
+        $.bg.style.backgroundColor = 'rgba(0, 0, 0, .85)';
+
         // get image, append to hammer element
         var image = new Ajax();
-        image.url = $.config.endpoint+`campaigns/${campaignID}`;
+        image.url = $.config.endpoint+`publications`;
+        image.data = {
+            'asid': asid,
+            'impressed_user': $.config.fingerprint
+        };
         image.getImage().then((response) => {
             // everything is good
             $.config.clickURL = response.clickURL;
             $.config.adID = response.adID;
+            $.config.campaignID = response.campaignID;
+
             /** add debug data to div if in debug mode
              * - width x height
              * - User Fingerprint (unique ID)
@@ -87,25 +108,37 @@ class HammerAS {
                                     <li ${styleData}>${$.config.fingerprint}
                                     <li style="display: inline;">${$.ua.getUA()}
                                 </ul>`;
-                //$.el.innerHTML = $.width+' x '+$.height+'<br>'+$.config.fingerprint;
-                $.el.innerHTML = debugData;
-                $.el.style.textAlign = 'center';
-                $.el.style.color = 'white';
-                $.el.style.fontWeight = 'bold';
-                $.el.style.textShadow = '0 0 2px black';
+                //$.ad.innerHTML = $.width+' x '+$.height+'<br>'+$.config.fingerprint;
+                $.ad.innerHTML = debugData;
+                $.ad.style.textAlign = 'center';
+                $.ad.style.color = 'white';
+                $.ad.style.fontWeight = 'bold';
+                $.ad.style.textShadow = '0 0 2px black';
             }
 
-            $.el.style.transition = 'all .3s';
-            $.el.style.backgroundImage = 'url("'+response.imageURL+'")';
-            $.el.style.backgroundSize = 'contain';
-            $.el.style.backgroundPosition = 'center center';
-            $.el.style.backgroundRepeat = 'no-repeat';
-            $.el.style.width = $.width + 'px';
-            $.el.style.height = $.height + 'px';
-            $.el.style.position = 'fixed';
-            $.el.style.top = 0 + 'px';
-            $.el.style.zIndex = $.config.zIndex;                    // make sure this is on top of other elements
-            $.el.style.backgroundColor = 'rgba(0, 0, 0, .85)';    // just in case the image isn't big enough
+            $.ad.style.transition = 'all .3s';
+            $.ad.style.backgroundImage = 'url("'+response.imageURL+'")';
+            $.ad.style.backgroundSize = 'contain';
+            $.ad.style.backgroundPosition = 'center center';
+            $.ad.style.backgroundRepeat = 'no-repeat';
+            $.ad.style.width = $.width + 'px';
+            $.ad.style.height = $.height + 'px';
+            $.ad.style.position = 'fixed';
+            $.ad.style.top = 0 + 'px';
+            $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements
+
+            // add question mark to ad
+            var q = document.createElement('div');
+            q.setAttribute("class", $.config.classElement+'_q');
+            $.ad.appendChild(q);
+
+            q.style.transition = 'all .3s';
+            q.style.width = $.width + 'px';
+            q.style.height = $.height + 'px';
+            q.style.position = 'fixed';
+            q.style.top = 0 + 'px';
+            q.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements
+            q.innerHTML = "<span>?</span>";
 
             // hammerjs
             $.resetElement();
@@ -122,12 +155,12 @@ class HammerAS {
         // I want this to swipe off-screen
         var x, y;
         if (arg === 'swipeleft') {
-            //$.el.style.background = '#42d692'; // green
-            x = -$.el.offsetWidth;
+            //$.ad.style.background = '#42d692'; // green
+            x = -$.ad.offsetWidth;
             //updateCount('left');
         } else if (arg === 'swiperight') {
-            //$.el.style.background = '#d63349'; // red
-            x = ($.start_x + 10) + $.el.offsetWidth;
+            //$.ad.style.background = '#d63349'; // red
+            x = ($.start_x + 10) + $.ad.offsetWidth;
         //    updateCount('right');
         } else {
             x = $.start_x;
@@ -155,9 +188,9 @@ class HammerAS {
         ];
 
         value = value.join(" ");
-        $.el.style.webkitTransform = value;
-        $.el.style.mozTransform = value;
-        $.el.style.transform = value;
+        $.ad.style.webkitTransform = value;
+        $.ad.style.mozTransform = value;
+        $.ad.style.transform = value;
         $.ticking = false;
     }
 
@@ -214,15 +247,6 @@ class HammerAS {
         $.sendAction(ev.type);
     }
 
-    // onTap(ev) {
-    //     var $ = this;
-    //
-    //     Velocity(document.body, { opacity: 0.5 });
-    //
-    //     $.logEvent(ev.type);
-    //     return;
-    // }
-
     onTap(ev) {
         var $ = this;
 
@@ -244,12 +268,13 @@ class HammerAS {
 
         // send tap event back to server
         var update = new Ajax();
-        update.url = $.config.endpoint+`campaigns/${$.config.campaignID}`;
+        update.url = $.config.endpoint+`publications/${$.config.asid}`;
         var data = {
             'action': action,
-            'cid': $.config.campaignID,
+            'asid': $.config.asid,
             'impressed_user': $.config.fingerprint,
             'ad_id': $.config.adID,
+            'campaign_id': $.config.campaignID,
             'browser_name': $.ua.getBrowser().name,
             'browser_version': $.ua.getBrowser().version,
             'device_model': $.ua.getDevice().model,
@@ -272,8 +297,10 @@ class HammerAS {
             $.mc.destroy();
 
             // destroy element
-            $.el.outerHTML = "";
-            delete $.el;
+            $.ad.outerHTML = "";
+            $.bg.outerHTML = "";
+            delete $.ad;
+            delete $.bg;
 
             if( action === 'tap' )
                 window.open($.config.clickURL);

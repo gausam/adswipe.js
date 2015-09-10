@@ -40,17 +40,27 @@ class Util {
      */
     findNextZIndex() {
         var $ = this;
-        var all = document.getElementsByTagName('*');
-        var highest = 0;
 
-        for( var i = 0; i < all.length; i++ ) {
-            var zi = document.defaultView.getComputedStyle(all[i],null).getPropertyValue("z-index");
-            if( (zi > highest) && (zi != 'auto') )
-                highest = zi;
+        // if no zIndex set in config yet
+        // aka, we only want to run all this on ad load so we don't eat up resources, so store in config and then add to that
+        // when adding new elements for ad layers (like info popup)
+        if( !$.config.zIndex ) {
+            var all = document.getElementsByTagName('*');
+            var highest = 0;
+
+            for( var i = 0; i < all.length; i++ ) {
+                var zi = document.defaultView.getComputedStyle(all[i],null).getPropertyValue("z-index");
+                if( (zi > highest) && (zi != 'auto') )
+                    highest = zi;
+            }
+
+            // cast highest as integer, add one (for next zindex)
+            $.config.zIndex = Number(highest)+1;
+        } else {
+            $.config.zIndex = $.config.zIndex+1;
         }
 
-        // cast highest as integer, add one (for next zindex), add to config
-        $.config.zIndex = Number(highest)+1;
+        return $.config.zIndex;
     }
 }
 

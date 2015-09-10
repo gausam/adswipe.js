@@ -4,14 +4,13 @@ requirejs.config({
     //the paths config could be for a directory.
     paths: {
         adswipe: 'scripts/adswipe.js'+'?bust='+(+new Date()),     // prevent cacheing
-        jquery: 'bower_components/jquery/dist/jquery.min',
-        uaparser: 'bower_components/ua-parser-js/dist/ua-parser.min'
+        jquery: 'bower_components/jquery/dist/jquery.min'
     }
 });
 
 // Start the main app logic.
-requirejs(['jquery', 'adswipe', 'uaparser'],
-function   ($,        adswipe,   UAParser) {
+requirejs(['jquery', 'adswipe'],
+function   ($,        adswipe) {
 
     // enter custom parameters
     adswipe.debug(true);
@@ -29,9 +28,6 @@ function   ($,        adswipe,   UAParser) {
         // });
 
         /* show ad */
-        adswipe.show('ZTHQK2mio4zUi74fj7Nw'); // enter campaign ID, ie 'ZTHQK2mio4zUi74fj7Nw'
+        adswipe.show('O8DcNrpiiLJdlyRtBFtP'); // enter ASID, ie 'O8DcNrpiiLJdlyRtBFtP'
     });
-
-    //var parser = new UAParser();
-    //console.log(parser.getResult());
 });

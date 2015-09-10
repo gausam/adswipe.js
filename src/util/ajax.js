@@ -51,6 +51,14 @@ class Ajax {
             if(!$.url)
                 reject(Error('No URL Set'));
 
+            if( typeof $.data !== 'undefined' && $.data !== null ){
+                var params = Object.keys($.data).map(function(key) {
+                    return key + '=' + $.data[key];
+                }).join('&');
+
+                $.url = $.url+'?'+params;
+            }
+
             req.open(method, $.url, $.async);
             req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             req.onload = function(event) {
@@ -63,7 +71,8 @@ class Ajax {
                         blob: blob,
                         imageURL: urlCreator.createObjectURL( blob ),
                         clickURL: response.clickURL,
-                        adID: response.adID
+                        adID: response.ad_id,
+                        campaignID: response.campaign_id
                     };
 
                     resolve($.response);

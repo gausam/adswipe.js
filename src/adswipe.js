@@ -9,17 +9,16 @@ var util = new Util(config);
 var hammer = new HammerAS(config);
 
 util.checkFingerprint();    // generate unique fingerprint for user
-util.findNextZIndex();      // find next z-index for interstitial ads
 
 /**
  * Allow API endpoint url to be returned or updated
  * @return  string or bool  if get (empty arg), return endpoint string; if set, update and return true
  */
-export function endpoint(endpoint) {
-    if( util.empty(endpoint) ){
+export function endpoint(newEndpoint) {
+    if( util.empty(newEndpoint) ){
         return config.endpoint;
     } else {
-       config.endpoint = endpoint; // ie 'http://adswipejs.dev.192.168.1.117.xip.io/';
+       config.endpoint = newEndpoint; // ie 'http://adswipejs.dev.192.168.1.117.xip.io/';
        return true;
     }
 }
@@ -28,11 +27,11 @@ export function endpoint(endpoint) {
  * Allow debug mode to be toggled
  * @return  bool        if get (empty arg), return debug bool; if set, update and return true
  */
-export function debug(debug) {
-    if( util.empty(debug) ){
+export function debug(newDebug) {
+    if( util.empty(newDebug) ){
         return config.debug;
     } else {
-       config.debug = debug;
+       config.debug = newDebug;
        return true;
     }
 }

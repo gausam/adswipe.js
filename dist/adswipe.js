@@ -89,18 +89,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	var hammer = new _utilHammerAsJs2['default'](config);
 
 	util.checkFingerprint(); // generate unique fingerprint for user
-	util.findNextZIndex(); // find next z-index for interstitial ads
 
 	/**
 	 * Allow API endpoint url to be returned or updated
 	 * @return  string or bool  if get (empty arg), return endpoint string; if set, update and return true
 	 */
 
-	function endpoint(endpoint) {
-	    if (util.empty(endpoint)) {
+	function endpoint(newEndpoint) {
+	    if (util.empty(newEndpoint)) {
 	        return config.endpoint;
 	    } else {
-	        config.endpoint = endpoint; // ie 'http://adswipejs.dev.192.168.1.117.xip.io/';
+	        config.endpoint = newEndpoint; // ie 'http://adswipejs.dev.192.168.1.117.xip.io/';
 	        return true;
 	    }
 	}
@@ -110,11 +109,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return  bool        if get (empty arg), return debug bool; if set, update and return true
 	 */
 
-	function debug(debug) {
-	    if (util.empty(debug)) {
+	function debug(newDebug) {
+	    if (util.empty(newDebug)) {
 	        return config.debug;
 	    } else {
-	        config.debug = debug;
+	        config.debug = newDebug;
 	        return true;
 	    }
 	}
@@ -186,16 +185,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Config() {
 	        _classCallCheck(this, Config);
 
-	        this._version = '0.1.0';
+	        this._version = '0.1.2';
 	        this._endpoint = 'http://adswipe.com/';
 	        this._debug = false;
 	        this._fingerprint = null;
 	        this._classElement = '_adswipe_' + (Math.random() * 1e32).toString(36);
 	        this._tapScale = '.95';
 	        this._zIndex = null;
-	        this._campaignID = null;
+	        this._asid = null;
 	        this._clickURL = null;
 	        this._adID = null;
+	        this._campaignID = null;
 	    }
 
 	    _createClass(Config, [{
@@ -238,12 +238,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._zIndex = zIndex;
 	        }
 	    }, {
-	        key: 'campaignID',
+	        key: 'asid',
 	        get: function get() {
-	            return this._campaignID;
+	            return this._asid;
 	        },
-	        set: function set(campaignID) {
-	            this._campaignID = campaignID;
+	        set: function set(asid) {
+	            this._asid = asid;
 	        }
 	    }, {
 	        key: 'clickURL',
@@ -260,6 +260,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        set: function set(adID) {
 	            this._adID = adID;
+	        }
+	    }, {
+	        key: 'campaignID',
+	        get: function get() {
+	            return this._campaignID;
+	        },
+	        set: function set(campaignID) {
+	            this._campaignID = campaignID;
 	        }
 	    }]);
 
@@ -338,16 +346,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        value: function findNextZIndex() {
 	            var $ = this;
-	            var all = document.getElementsByTagName('*');
-	            var highest = 0;
 
-	            for (var i = 0; i < all.length; i++) {
-	                var zi = document.defaultView.getComputedStyle(all[i], null).getPropertyValue('z-index');
-	                if (zi > highest && zi != 'auto') highest = zi;
+	            // if no zIndex set in config yet
+	            // aka, we only want to run all this on ad load so we don't eat up resources, so store in config and then add to that
+	            // when adding new elements for ad layers (like info popup)
+	            if (!$.config.zIndex) {
+	                var all = document.getElementsByTagName('*');
+	                var highest = 0;
+
+	                for (var i = 0; i < all.length; i++) {
+	                    var zi = document.defaultView.getComputedStyle(all[i], null).getPropertyValue('z-index');
+	                    if (zi > highest && zi != 'auto') highest = zi;
+	                }
+
+	                // cast highest as integer, add one (for next zindex)
+	                $.config.zIndex = Number(highest) + 1;
+	            } else {
+	                $.config.zIndex = $.config.zIndex + 1;
 	            }
 
-	            // cast highest as integer, add one (for next zindex), add to config
-	            $.config.zIndex = Number(highest) + 1;
+	            return $.config.zIndex;
 	        }
 	    }]);
 
@@ -1514,15 +1532,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _uaparser2 = _interopRequireDefault(_uaparser);
 
+	var _utilUtilJs = __webpack_require__(2);
+
+	var _utilUtilJs2 = _interopRequireDefault(_utilUtilJs);
+
 	var HammerAS = (function () {
 	    function HammerAS(config) {
 	        _classCallCheck(this, HammerAS);
 
 	        this.config = config;
+	        this.util = new _utilUtilJs2['default'](config);
 
 	        this.width = document.documentElement.clientWidth;
 	        this.height = document.documentElement.clientHeight;
-	        this.el = null;
+	        this.ad = null;
+	        this.bg = null;
 	        this.mc = null;
 
 	        this.start_x = 0;
@@ -1533,16 +1557,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.timer = null;
 
 	        this.ua = new _uaparser2['default']();
-	        console.log(this.ua.getResult());
 
 	        // add 'adswipe' div node
-	        var classname = this.config.classElement;
-	        this.el = document.createElement('div');
-	        this.el.setAttribute('class', classname);
-	        document.body.appendChild(this.el);
+	        this.ad = document.createElement('div');
+	        this.ad.setAttribute('class', this.config.classElement);
+	        document.body.appendChild(this.ad);
+
+	        // add semi-transparent black bg (will be under ad)
+	        this.bg = document.createElement('div');
+	        this.bg.setAttribute('class', this.config.classElement + '_bg');
+	        document.body.appendChild(this.bg);
 
 	        // set up hammerjs
-	        this.mc = new _hammer2['default'].Manager(this.el);
+	        this.mc = new _hammer2['default'].Manager(this.ad);
 	        this.mc.add(new _hammer2['default'].Pan());
 	        this.mc.add(new _hammer2['default'].Swipe({
 	            threshold: 5,
@@ -1568,24 +1595,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Show ad
 	         * @return {[type]} [description]
 	         */
-	        value: function show(campaignID) {
+	        value: function show(asid) {
 	            var $ = this;
 
 	            // if Adswipe element removed, action has already been taken on this capaign, do not repeat
-	            if (!$.el) return false;
+	            if (!$.ad) return false;
 
-	            $.config.campaignID = campaignID;
+	            $.config.asid = asid;
 
 	            $.width = document.documentElement.clientWidth;
 	            $.height = document.documentElement.clientHeight;
 
+	            // add semi-transparent background style to bg element
+	            $.bg.style.transition = 'all .3s';
+	            $.bg.style.width = $.width + 'px';
+	            $.bg.style.height = $.height + 'px';
+	            $.bg.style.position = 'fixed';
+	            $.bg.style.top = 0 + 'px';
+	            $.bg.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements, ad will be placed on top of this
+	            $.bg.style.backgroundColor = 'rgba(0, 0, 0, .85)';
+
 	            // get image, append to hammer element
 	            var image = new _utilAjaxJs2['default']();
-	            image.url = $.config.endpoint + ('campaigns/' + campaignID);
+	            image.url = $.config.endpoint + 'publications';
+	            image.data = {
+	                'asid': asid,
+	                'impressed_user': $.config.fingerprint
+	            };
 	            image.getImage().then(function (response) {
 	                // everything is good
 	                $.config.clickURL = response.clickURL;
 	                $.config.adID = response.adID;
+	                $.config.campaignID = response.campaignID;
+
 	                /** add debug data to div if in debug mode
 	                 * - width x height
 	                 * - User Fingerprint (unique ID)
@@ -1597,25 +1639,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var styleTitle = 'style="width: 30%; display: inline-block;"';
 	                    var styleData = 'style="width: 70%; display: inline-block;"';
 	                    var debugData = '<ul style="width: ' + styleWidth + '; display: inline-block;">\n                                    <li ' + styleTitle + '>Width x Height\n                                    <li ' + styleData + '>' + $.width + ' x ' + $.height + '\n                                    <li ' + styleTitle + '>User Fingerprint\n                                    <li ' + styleData + '>' + $.config.fingerprint + '\n                                    <li style="display: inline;">' + $.ua.getUA() + '\n                                </ul>';
-	                    //$.el.innerHTML = $.width+' x '+$.height+'<br>'+$.config.fingerprint;
-	                    $.el.innerHTML = debugData;
-	                    $.el.style.textAlign = 'center';
-	                    $.el.style.color = 'white';
-	                    $.el.style.fontWeight = 'bold';
-	                    $.el.style.textShadow = '0 0 2px black';
+	                    //$.ad.innerHTML = $.width+' x '+$.height+'<br>'+$.config.fingerprint;
+	                    $.ad.innerHTML = debugData;
+	                    $.ad.style.textAlign = 'center';
+	                    $.ad.style.color = 'white';
+	                    $.ad.style.fontWeight = 'bold';
+	                    $.ad.style.textShadow = '0 0 2px black';
 	                }
 
-	                $.el.style.transition = 'all .3s';
-	                $.el.style.backgroundImage = 'url("' + response.imageURL + '")';
-	                $.el.style.backgroundSize = 'contain';
-	                $.el.style.backgroundPosition = 'center center';
-	                $.el.style.backgroundRepeat = 'no-repeat';
-	                $.el.style.width = $.width + 'px';
-	                $.el.style.height = $.height + 'px';
-	                $.el.style.position = 'fixed';
-	                $.el.style.top = 0 + 'px';
-	                $.el.style.zIndex = $.config.zIndex; // make sure this is on top of other elements
-	                $.el.style.backgroundColor = 'rgba(0, 0, 0, .85)'; // just in case the image isn't big enough
+	                $.ad.style.transition = 'all .3s';
+	                $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
+	                $.ad.style.backgroundSize = 'contain';
+	                $.ad.style.backgroundPosition = 'center center';
+	                $.ad.style.backgroundRepeat = 'no-repeat';
+	                $.ad.style.width = $.width + 'px';
+	                $.ad.style.height = $.height + 'px';
+	                $.ad.style.position = 'fixed';
+	                $.ad.style.top = 0 + 'px';
+	                $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements
+
+	                // add question mark to ad
+	                var q = document.createElement('div');
+	                q.setAttribute('class', $.config.classElement + '_q');
+	                $.ad.appendChild(q);
+
+	                q.style.transition = 'all .3s';
+	                q.style.width = $.width + 'px';
+	                q.style.height = $.height + 'px';
+	                q.style.position = 'fixed';
+	                q.style.top = 0 + 'px';
+	                q.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements
+	                q.innerHTML = '<span>?</span>';
 
 	                // hammerjs
 	                $.resetElement();
@@ -1633,12 +1687,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // I want this to swipe off-screen
 	            var x, y;
 	            if (arg === 'swipeleft') {
-	                //$.el.style.background = '#42d692'; // green
-	                x = -$.el.offsetWidth;
+	                //$.ad.style.background = '#42d692'; // green
+	                x = -$.ad.offsetWidth;
 	                //updateCount('left');
 	            } else if (arg === 'swiperight') {
-	                //$.el.style.background = '#d63349'; // red
-	                x = $.start_x + 10 + $.el.offsetWidth;
+	                //$.ad.style.background = '#d63349'; // red
+	                x = $.start_x + 10 + $.ad.offsetWidth;
 	                //    updateCount('right');
 	            } else {
 	                x = $.start_x;
@@ -1664,9 +1718,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var value = ['translate3d(' + $.transform.translate.x + 'px, ' + $.transform.translate.y + 'px, 0)', 'scale(' + $.transform.scale + ', ' + $.transform.scale + ')'];
 
 	            value = value.join(' ');
-	            $.el.style.webkitTransform = value;
-	            $.el.style.mozTransform = value;
-	            $.el.style.transform = value;
+	            $.ad.style.webkitTransform = value;
+	            $.ad.style.mozTransform = value;
+	            $.ad.style.transform = value;
 	            $.ticking = false;
 	        }
 	    }, {
@@ -1727,16 +1781,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'onTap',
-
-	        // onTap(ev) {
-	        //     var $ = this;
-	        //
-	        //     Velocity(document.body, { opacity: 0.5 });
-	        //
-	        //     $.logEvent(ev.type);
-	        //     return;
-	        // }
-
 	        value: function onTap(ev) {
 	            var $ = this;
 
@@ -1761,12 +1805,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            // send tap event back to server
 	            var update = new _utilAjaxJs2['default']();
-	            update.url = $.config.endpoint + ('campaigns/' + $.config.campaignID);
+	            update.url = $.config.endpoint + ('publications/' + $.config.asid);
 	            var data = {
 	                'action': action,
-	                'cid': $.config.campaignID,
+	                'asid': $.config.asid,
 	                'impressed_user': $.config.fingerprint,
 	                'ad_id': $.config.adID,
+	                'campaign_id': $.config.campaignID,
 	                'browser_name': $.ua.getBrowser().name,
 	                'browser_version': $.ua.getBrowser().version,
 	                'device_model': $.ua.getDevice().model,
@@ -1789,8 +1834,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.mc.destroy();
 
 	                // destroy element
-	                $.el.outerHTML = '';
-	                delete $.el;
+	                $.ad.outerHTML = '';
+	                $.bg.outerHTML = '';
+	                delete $.ad;
+	                delete $.bg;
 
 	                if (action === 'tap') window.open($.config.clickURL);
 	            });
@@ -4343,6 +4390,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return new Promise(function (resolve, reject) {
 	                if (!$.url) reject(Error('No URL Set'));
 
+	                if (typeof $.data !== 'undefined' && $.data !== null) {
+	                    var params = Object.keys($.data).map(function (key) {
+	                        return key + '=' + $.data[key];
+	                    }).join('&');
+
+	                    $.url = $.url + '?' + params;
+	                }
+
 	                req.open(method, $.url, $.async);
 	                req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	                req.onload = function (event) {
@@ -4355,7 +4410,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            blob: blob,
 	                            imageURL: urlCreator.createObjectURL(blob),
 	                            clickURL: response.clickURL,
-	                            adID: response.adID
+	                            adID: response.ad_id,
+	                            campaignID: response.campaign_id
 	                        };
 
 	                        resolve($.response);
