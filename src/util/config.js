@@ -1,7 +1,7 @@
 /*jshint esnext: true */
 class Config {
     constructor() {
-        this._version = '0.1.2';
+        this._version = '0.1.3';
         this._endpoint = 'http://adswipe.com/';
         this._debug = false;
         this._fingerprint = null;

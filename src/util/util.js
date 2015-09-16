@@ -62,6 +62,25 @@ class Util {
 
         return $.config.zIndex;
     }
+    /**
+     * Figure out which transition event the browser is using
+     */
+     whichTransitionEvent() {
+         var t;
+         var el = document.createElement('fakeelement');
+         var transitions = {
+           'transition':'transitionend',
+           'OTransition':'oTransitionEnd',
+           'MozTransition':'transitionend',
+           'WebkitTransition':'webkitTransitionEnd'
+       };
+
+         for(t in transitions) {
+             if( el.style[t] !== undefined ){
+                 return transitions[t];
+             }
+         }
+     }
 }
 
 export default Util;

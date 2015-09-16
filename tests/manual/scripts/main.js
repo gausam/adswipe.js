@@ -13,7 +13,7 @@ requirejs(['jquery', 'adswipe'],
 function   ($,        adswipe) {
 
     // enter custom parameters
-    adswipe.debug(true);
+    //adswipe.debug(true);
     adswipe.endpoint('http://api.adswipe.dev.192.168.1.117.xip.io');
 
     $('.as-init').on('click', function(){

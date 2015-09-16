@@ -185,7 +185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Config() {
 	        _classCallCheck(this, Config);
 
-	        this._version = '0.1.2';
+	        this._version = '0.1.3';
 	        this._endpoint = 'http://adswipe.com/';
 	        this._debug = false;
 	        this._fingerprint = null;
@@ -366,6 +366,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            return $.config.zIndex;
+	        }
+	    }, {
+	        key: 'whichTransitionEvent',
+
+	        /**
+	         * Figure out which transition event the browser is using
+	         */
+	        value: function whichTransitionEvent() {
+	            var t;
+	            var el = document.createElement('fakeelement');
+	            var transitions = {
+	                'transition': 'transitionend',
+	                'OTransition': 'oTransitionEnd',
+	                'MozTransition': 'transitionend',
+	                'WebkitTransition': 'webkitTransitionEnd'
+	            };
+
+	            for (t in transitions) {
+	                if (el.style[t] !== undefined) {
+	                    return transitions[t];
+	                }
+	            }
 	        }
 	    }]);
 
@@ -1567,6 +1589,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.bg = document.createElement('div');
 	        this.bg.setAttribute('class', this.config.classElement + '_bg');
 	        document.body.appendChild(this.bg);
+	        this.bg.style.transition = 'all .5s';
+	        this.bg.style.opacity = 0;
+
+	        // add ? to top right corner to explain what AS does
+	        this.q = document.createElement('div');
+	        this.q.setAttribute('class', this.config.classElement + '_q');
+	        document.body.appendChild(this.q);
+
+	        // add info overlay for users wanting to learn what AS does
+	        this.info = document.createElement('div');
+	        this.info.setAttribute('class', this.config.classElement + '_info');
+	        document.body.appendChild(this.info);
 
 	        // set up hammerjs
 	        this.mc = new _hammer2['default'].Manager(this.ad);
@@ -1607,13 +1641,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            $.height = document.documentElement.clientHeight;
 
 	            // add semi-transparent background style to bg element
-	            $.bg.style.transition = 'all .3s';
 	            $.bg.style.width = $.width + 'px';
 	            $.bg.style.height = $.height + 'px';
 	            $.bg.style.position = 'fixed';
 	            $.bg.style.top = 0 + 'px';
 	            $.bg.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements, ad will be placed on top of this
 	            $.bg.style.backgroundColor = 'rgba(0, 0, 0, .85)';
+	            // fade in $.bg
+	            $.bg.style.opacity = 1;
 
 	            // get image, append to hammer element
 	            var image = new _utilAjaxJs2['default']();
@@ -1647,7 +1682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    $.ad.style.textShadow = '0 0 2px black';
 	                }
 
-	                $.ad.style.transition = 'all .3s';
+	                $.ad.style.transition = 'all .5s';
 	                $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
 	                $.ad.style.backgroundSize = 'contain';
 	                $.ad.style.backgroundPosition = 'center center';
@@ -1655,21 +1690,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.ad.style.width = $.width + 'px';
 	                $.ad.style.height = $.height + 'px';
 	                $.ad.style.position = 'fixed';
-	                $.ad.style.top = 0 + 'px';
-	                $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements
+	                $.ad.style.top = '0px';
+	                $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg
 
-	                // add question mark to ad
-	                var q = document.createElement('div');
-	                q.setAttribute('class', $.config.classElement + '_q');
-	                $.ad.appendChild(q);
+	                $.q.style.transition = 'all .5s';
+	                $.q.style.color = 'rgb(181, 181, 181)';
+	                $.q.style.textAlign = 'right';
+	                $.q.style.height = '50px';
+	                $.q.style.width = '50px';
+	                $.q.style.position = 'fixed';
+	                $.q.style.top = '0px';
+	                $.q.style.right = '0';
+	                $.q.style.padding = '10px';
+	                $.q.style.fontSize = 'large';
+	                $.q.innerHTML = '<span id="' + $.config.classElement + '_q" style="cursor: pointer; padding: 5px; background-color: rgba(0, 0, 0, .20);">\n                                (?)\n                            </span>';
+	                $.q.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg, $.ad
 
-	                q.style.transition = 'all .3s';
-	                q.style.width = $.width + 'px';
-	                q.style.height = $.height + 'px';
-	                q.style.position = 'fixed';
-	                q.style.top = 0 + 'px';
-	                q.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements
-	                q.innerHTML = '<span>?</span>';
+	                $.info.style.transition = 'all .5s';
+	                $.info.style.visibility = 'hidden';
+	                $.info.style.opacity = 0;
+	                $.info.style.color = 'rgb(181, 181, 181)';
+	                $.info.style.backgroundColor = 'rgba(0, 0, 0, .85)';
+	                $.info.style.width = $.width + 'px';
+	                $.info.style.height = $.height + 'px';
+	                $.info.style.position = 'fixed';
+	                $.info.style.top = '0px';
+	                $.info.style.padding = '10px';
+	                $.info.style.fontSize = 'large';
+	                $.info.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg, $.ad
+	                $.info.innerHTML = '<div style="width: 50%; margin-left: 25%;">\n                                    <div style="margin-bottom: 10px; text-align: center; font-size: larger;">\n                                        <strong>How Adswipe Works</strong>\n                                    </div>\n                                    <div style="margin-bottom: 10px;">\n                                        <div style="float: left; margin: 5px 15px 0 0; height: 30px;\n                                        padding: 5px 10px 5px 10px; border: 1px solid white; text-align: center;">\n                                            Swipe Left\n                                        </div>\n\n                                        <p>You understand that ads are inevitable, the trade-off for using cool\n                                        software at a reasonable price. By swiping left, you\'re telling us that you\'re\n                                        kinda into what the ad was about, but aren\'t sold enough to click it yet. We\n                                        want to make sure that if you\'re going to be advertised to, it may as well be\n                                        as useful to you as possible. We\'ll find something you like!</p>\n                                    </div>\n                                    <div style="margin-bottom: 10px;">\n                                        <div style="float: right; margin: 5px 0 0 15px; height: 30px;\n                                        padding: 5px 10px 5px 10px; border: 1px solid white; text-align: center;">\n                                            Swipe Right\n                                        </div>\n\n                                        <p style="text-align: right;">You don\'t resonate with anything about this ad,\n                                        and you know what? That\'s okay! We\'ll try to find something that does, even if\n                                        that means digging through the sofa to find it!</p>\n                                    </div>\n                                </div>';
+
+	                // onclick event to fade in info overlay
+	                $.q.addEventListener('click', function () {
+	                    if ($.info.style.visibility === 'hidden') {
+	                        $.info.style.opacity = 1;
+	                        $.info.style.visibility = 'visible';
+	                    }
+	                }, false);
+
+	                // onclick event to fade out info overlay
+	                $.info.addEventListener('click', function () {
+	                    if ($.info.style.visibility === 'visible') {
+	                        $.info.style.opacity = 0;
+	                        $.info.style.visibility = 'hidden';
+	                    }
+	                }, false);
 
 	                // hammerjs
 	                $.resetElement();
@@ -1799,8 +1864,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'sendAction',
 	        value: function sendAction(action) {
-	            var _this = this;
-
 	            var $ = this;
 
 	            // send tap event back to server
@@ -1825,19 +1888,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	                'user_agent': $.ua.getUA()
 	            };
 	            update.post(data).then(function (response) {
-	                // unbind events (must include callback function originally used)
-	                $.mc.off('swipeleft swiperight', $.onSwipe.bind(_this));
-	                $.mc.off('panleft panright panend', $.onPan.bind(_this));
-	                $.mc.off('tap', $.onTap.bind(_this));
-
-	                // destroy hammer instance
+	                // destroy hammer instance (events should unbind through garbage collection)
 	                $.mc.destroy();
+	                delete $.mc;
 
-	                // destroy element
-	                $.ad.outerHTML = '';
-	                $.bg.outerHTML = '';
-	                delete $.ad;
-	                delete $.bg;
+	                // now fade out $.ad, $.bg, $.q
+	                // 'delete' should make browser's garbage collection remove any lingering event listeners
+	                var transitionEnd = $.util.whichTransitionEvent();
+	                $.ad.addEventListener(transitionEnd, function () {
+	                    $.ad.outerHTML = '';
+	                    delete $.ad;
+	                }, false);
+
+	                $.bg.addEventListener(transitionEnd, function () {
+	                    $.bg.outerHTML = '';
+	                    delete $.bg;
+	                }, false);
+
+	                $.q.addEventListener(transitionEnd, function () {
+	                    $.q.outerHTML = '';
+	                    delete $.q;
+	                }, false);
+
+	                $.ad.style.opacity = 0;
+	                $.bg.style.opacity = 0;
+	                $.q.style.opacity = 0;
+
+	                // also remove info (it just didn't need to be faded out)
+	                $.info.outerHTML = '';
+	                delete $.info;
 
 	                if (action === 'tap') window.open($.config.clickURL);
 	            });
