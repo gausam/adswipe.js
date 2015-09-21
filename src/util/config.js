@@ -1,7 +1,7 @@
 /*jshint esnext: true */
 class Config {
     constructor() {
-        this._version = '0.1.3';
+        this._version = '0.1.4';
         this._endpoint = 'http://adswipe.com/';
         this._debug = false;
         this._fingerprint = null;
@@ -12,6 +12,7 @@ class Config {
         this._clickURL = null;
         this._adID = null;
         this._campaignID = null;
+        this._isShown = false;
     }
 
     get version() { return this._version; }
@@ -40,6 +41,9 @@ class Config {
 
     get campaignID() { return this._campaignID; }
     set campaignID(campaignID) { this._campaignID = campaignID; }
+
+    get isShown() { return this._isShown; }
+    set isShown(isShown) { this._isShown = isShown; }
 }
 
 export default Config;
