@@ -2,7 +2,7 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(factory);
+		define([], factory);
 	else if(typeof exports === 'object')
 		exports["adswipe"] = factory();
 	else
@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utilHammerAsJs2 = _interopRequireDefault(_utilHammerAsJs);
 
-	var _utilAjaxJs = __webpack_require__(7);
+	var _utilAjaxJs = __webpack_require__(6);
 
 	var _utilAjaxJs2 = _interopRequireDefault(_utilAjaxJs);
 
@@ -314,24 +314,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.config = config;
 	    }
 
+	    /**
+	     * Shortcut to check if variable is empty or not
+	     * @param  string       variable to check
+	     * @return bool         true if empty, false if not
+	     */
+
 	    _createClass(Util, [{
 	        key: 'empty',
-
-	        /**
-	         * Shortcut to check if variable is empty or not
-	         * @param  string       variable to check
-	         * @return bool         true if empty, false if not
-	         */
 	        value: function empty(arg) {
 	            if (typeof arg === 'undefined' || arg === null) return true;else return false;
 	        }
-	    }, {
-	        key: 'checkFingerprint',
 
 	        /**
 	         * Generate and store (in config/LocalStorage) unique user fingerprint to track user's swipes/clicks
 	         * @return n/a
 	         */
+	    }, {
+	        key: 'checkFingerprint',
 	        value: function checkFingerprint() {
 	            var $ = this;
 	            if (!$.config.fingerprint) {
@@ -346,13 +346,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	        }
-	    }, {
-	        key: 'findNextZIndex',
 
 	        /**
 	         * Go through all the elements on the page and find the next highest z-index so adswipe appears on top
 	         * @return {int}    z-index number to set adswipe to
 	         */
+	    }, {
+	        key: 'findNextZIndex',
 	        value: function findNextZIndex() {
 	            var $ = this;
 
@@ -364,7 +364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var highest = 0;
 
 	                for (var i = 0; i < all.length; i++) {
-	                    var zi = document.defaultView.getComputedStyle(all[i], null).getPropertyValue('z-index');
+	                    var zi = document.defaultView.getComputedStyle(all[i], null).getPropertyValue("z-index");
 	                    if (zi > highest && zi != 'auto') highest = zi;
 	                }
 
@@ -376,12 +376,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return $.config.zIndex;
 	        }
-	    }, {
-	        key: 'whichTransitionEvent',
 
 	        /**
 	         * Figure out which transition event the browser is using
 	         */
+	    }, {
+	        key: 'whichTransitionEvent',
 	        value: function whichTransitionEvent() {
 	            var t;
 	            var el = document.createElement('fakeelement');
@@ -396,6 +396,65 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (el.style[t] !== undefined) {
 	                    return transitions[t];
 	                }
+	            }
+	        }
+
+	        /**
+	         * Given an element in the DOM, the function will execute the scripts in there (or have them load and run)
+	         */
+	    }, {
+	        key: 'executeScripts',
+	        value: function executeScripts(body_el) {
+
+	            function nodeName(elem, name) {
+	                return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
+	            };
+
+	            function evalScript(elem) {
+	                var data = elem.text || elem.textContent || elem.innerHTML || "",
+	                    head = document.getElementsByTagName("head")[0] || document.documentElement,
+	                    script = document.createElement("script");
+
+	                script.type = "text/javascript";
+
+	                //If script has src attribute, add it
+	                if (elem.src.length > 0) {
+	                    script.src = elem.src;
+	                } else {
+	                    //other add the script's code
+	                    try {
+	                        // doesn't work on ie...
+	                        script.appendChild(document.createTextNode(data));
+	                    } catch (e) {
+	                        // IE has funky script nodes
+	                        script.text = data;
+	                    }
+	                }
+
+	                head.insertBefore(script, head.firstChild);
+	                head.removeChild(script);
+	            };
+
+	            // main section of function
+	            var scripts = [],
+	                script,
+	                children_nodes = body_el.childNodes,
+	                child,
+	                i;
+
+	            for (i = 0; children_nodes[i]; i++) {
+	                child = children_nodes[i];
+	                if (nodeName(child, "script") && (!child.type || child.type.toLowerCase() === "text/javascript")) {
+	                    scripts.push(child);
+	                }
+	            }
+
+	            for (i = 0; scripts[i]; i++) {
+	                script = scripts[i];
+	                if (script.parentNode) {
+	                    script.parentNode.removeChild(script);
+	                }
+	                evalScript(scripts[i]);
 	            }
 	        }
 	    }]);
@@ -907,7 +966,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      try {
 	        document.createEvent("TouchEvent");
 	        touchEvent = true;
-	      } catch (_) {}
+	      } catch (_) {/* squelch */}
 	      var touchStart = ("ontouchstart" in window);
 	      return [maxTouchPoints, touchEvent, touchStart];
 	    },
@@ -926,7 +985,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // https://securehomes.esat.kuleuven.be/~gacar/persistent/the_web_never_forgets.pdf
 	      try {
 	        ctx.globalCompositeOperation = "screen";
-	      } catch (e) {}
+	      } catch (e) {/* squelch */}
 	      result.push("canvas blending:" + (ctx.globalCompositeOperation === "screen" ? "yes" : "no"));
 
 	      // detect browser support of canvas winding
@@ -1293,7 +1352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var gl = null;
 	      try {
 	        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-	      } catch (e) {}
+	      } catch (e) {/* squelch */}
 	      if (!gl) {
 	        gl = null;
 	      }
@@ -1532,7 +1591,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	  return Fingerprint2;
 	});
-	/* squelch */ /* squelch */ /* squelch */
 
 /***/ },
 /* 4 */
@@ -1555,11 +1613,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _hammer2 = _interopRequireDefault(_hammer);
 
-	var _utilAjaxJs = __webpack_require__(7);
+	var _utilAjaxJs = __webpack_require__(6);
 
 	var _utilAjaxJs2 = _interopRequireDefault(_utilAjaxJs);
 
-	var _uaparser = __webpack_require__(8);
+	var _uaparser = __webpack_require__(7);
 
 	var _uaparser2 = _interopRequireDefault(_uaparser);
 
@@ -1597,24 +1655,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            // add 'adswipe' div node
 	            $.ad = document.createElement('div');
-	            $.ad.setAttribute('class', $.config.classElement);
+	            $.ad.setAttribute("class", $.config.classElement);
 	            document.body.appendChild($.ad);
 
 	            // add semi-transparent black bg (will be under ad)
 	            $.bg = document.createElement('div');
-	            $.bg.setAttribute('class', $.config.classElement + '_bg');
+	            $.bg.setAttribute("class", $.config.classElement + '_bg');
 	            document.body.appendChild($.bg);
 	            $.bg.style.transition = 'all .5s';
 	            $.bg.style.opacity = 0;
 
 	            // add ? to top right corner to explain what AS does
 	            $.q = document.createElement('div');
-	            $.q.setAttribute('class', $.config.classElement + '_q');
+	            $.q.setAttribute("class", $.config.classElement + '_q');
 	            document.body.appendChild($.q);
 
 	            // add info overlay for users wanting to learn what AS does
 	            $.info = document.createElement('div');
-	            $.info.setAttribute('class', $.config.classElement + '_info');
+	            $.info.setAttribute("class", $.config.classElement + '_info');
 	            document.body.appendChild($.info);
 	            $.info.style.visibility = 'hidden';
 	            $.info.style.opacity = 0;
@@ -1629,9 +1687,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            $.mc.add(new _hammer2['default'].Tap());
 
 	            // event listeners
-	            $.mc.on('swipeleft swiperight', $.onSwipe.bind(this));
-	            $.mc.on('panleft panright panend', $.onPan.bind(this));
-	            $.mc.on('tap', $.onTap.bind(this));
+	            $.mc.on("swipeleft swiperight", $.onSwipe.bind(this));
+	            $.mc.on("panleft panright panend", $.onPan.bind(this));
+	            $.mc.on("tap", $.onTap.bind(this));
 
 	            // execute callback, if set
 	            if (callback) {
@@ -1654,13 +1712,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	            }
 	        }
-	    }, {
-	        key: 'show',
 
 	        /**
 	         * Show ad
 	         * @return {[type]} [description]
 	         */
+	    }, {
+	        key: 'show',
 	        value: function show(asid) {
 	            var $ = this;
 
@@ -1716,15 +1774,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                $.ad.style.transition = 'all .5s';
-	                $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
-	                $.ad.style.backgroundSize = 'contain';
-	                $.ad.style.backgroundPosition = 'center center';
-	                $.ad.style.backgroundRepeat = 'no-repeat';
+
+	                if (response.type == 'adNetwork') {
+	                    console.log('AdNetwork stuff', response.adNetworkEmbed);
+	                    //Show AdNetwork embed
+	                    if ($.config.debug) {
+	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
+	                    } else {
+	                        $.ad.innerHTML = response.adNetworkEmbed;
+	                    }
+	                } else {
+	                    //Show Image Ad
+	                    $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
+	                    $.ad.style.backgroundSize = 'contain';
+	                    $.ad.style.backgroundPosition = 'center center';
+	                    $.ad.style.backgroundRepeat = 'no-repeat';
+	                }
+
 	                $.ad.style.width = $.width + 'px';
 	                $.ad.style.height = $.height + 'px';
 	                $.ad.style.position = 'fixed';
 	                $.ad.style.top = '0px';
 	                $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg
+
+	                //Run any scripts in the embedded ad (for Ad Network ads)
+	                if (response.type == 'adNetwork') $.util.executeScripts($.ad);
 
 	                $.q.style.transition = 'all .5s';
 	                $.q.style.color = 'rgb(181, 181, 181)';
@@ -1749,7 +1823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.info.style.fontSize = 'large';
 	                $.info.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg, $.ad
 
-	                if ($.ua.getDevice().type === 'mobile') infoStyle = 'width: 90%; margin-left: 5%;';else infoStyle = 'width: 50%; margin-left: 25%;';
+	                if ($.ua.getDevice().type === 'mobile') infoStyle = "width: 90%; margin-left: 5%;";else infoStyle = "width: 50%; margin-left: 25%;";
 
 	                $.info.innerHTML = '<div style="height: ' + $.height + 'px; padding: 10px; overflow-y: auto; ' + infoStyle + '">\n                                    <div style="margin-bottom: 10px; text-align: center; font-size: larger;">\n                                        <strong>How Adswipe Works</strong>\n                                    </div>\n                                    <div style="margin-bottom: 10px;">\n                                        <div style="float: left; margin: 5px 15px 0 0; height: 30px;\n                                        padding: 5px 10px 5px 10px; border: 1px solid white; text-align: center;">\n                                            Swipe Left\n                                        </div>\n\n                                        <p>You understand that ads are inevitable, the trade-off for using cool\n                                        software at a reasonable price. By swiping left, you\'re telling us that you\'re\n                                        kinda into what the ad was about, but aren\'t sold enough to click it yet. We\n                                        want to make sure that if you\'re going to be advertised to, it may as well be\n                                        as useful to you as possible. We\'ll find something you like!</p>\n                                    </div>\n                                    <div style="margin-bottom: 10px;">\n                                        <div style="float: right; margin: 5px 0 0 15px; height: 30px;\n                                        padding: 5px 10px 5px 10px; border: 1px solid white; text-align: center;">\n                                            Swipe Right\n                                        </div>\n\n                                        <p style="text-align: right;">You don\'t resonate with anything about this ad,\n                                        and you know what? That\'s okay! We\'ll try to find something that does, even if\n                                        that means digging through the sofa to find it!</p>\n                                    </div>\n                                </div>';
 
@@ -1789,12 +1863,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                x = -$.ad.offsetWidth;
 	                //updateCount('left');
 	            } else if (arg === 'swiperight') {
-	                //$.ad.style.background = '#d63349'; // red
-	                x = $.start_x + 10 + $.ad.offsetWidth;
-	                //    updateCount('right');
-	            } else {
-	                x = $.start_x;
-	            }
+	                    //$.ad.style.background = '#d63349'; // red
+	                    x = $.start_x + 10 + $.ad.offsetWidth;
+	                    //    updateCount('right');
+	                } else {
+	                        x = $.start_x;
+	                    }
 	            $.transform = {
 	                translate: {
 	                    x: x,
@@ -1815,7 +1889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var value = ['translate3d(' + $.transform.translate.x + 'px, ' + $.transform.translate.y + 'px, 0)', 'scale(' + $.transform.scale + ', ' + $.transform.scale + ')'];
 
-	            value = value.join(' ');
+	            value = value.join(" ");
 	            $.ad.style.webkitTransform = value;
 	            $.ad.style.mozTransform = value;
 	            $.ad.style.transform = value;
@@ -1940,17 +2014,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // 'delete' should make browser's garbage collection remove any lingering event listeners
 	            var transitionEnd = $.util.whichTransitionEvent();
 	            $.ad.addEventListener(transitionEnd, function () {
-	                $.ad.outerHTML = '';
+	                $.ad.outerHTML = "";
 	                delete $.ad;
 	            }, false);
 
 	            $.bg.addEventListener(transitionEnd, function () {
-	                $.bg.outerHTML = '';
+	                $.bg.outerHTML = "";
 	                delete $.bg;
 	            }, false);
 
 	            $.q.addEventListener(transitionEnd, function () {
-	                $.q.outerHTML = '';
+	                $.q.outerHTML = "";
 	                delete $.q;
 	            }, false);
 
@@ -1959,14 +2033,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            $.q.style.opacity = 0;
 
 	            // also remove info (it just didn't need to be faded out)
-	            $.info.outerHTML = '';
+	            $.info.outerHTML = "";
 	            delete $.info;
 
 	            // reset config values
 	            $.config.isShown = false;
 
 	            // execute callback, if set
-	            if (callback && typeof callback === 'function') {
+	            if (callback && typeof callback === "function") {
 	                callback();
 	            }
 	        }
@@ -1989,17 +2063,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.4 - 2014-09-28
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.7 - 2016-04-22
 	 * http://hammerjs.github.io/
 	 *
-	 * Copyright (c) 2014 Jorik Tangelder;
+	 * Copyright (c) 2016 Jorik Tangelder;
 	 * Licensed under the MIT license */
 	'use strict';
 
 	(function (window, document, exportName, undefined) {
 	    'use strict';
 
-	    var VENDOR_PREFIXES = ['', 'webkit', 'moz', 'MS', 'ms', 'o'];
+	    var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
 	    var TEST_ELEMENT = document.createElement('div');
 
 	    var TYPE_FUNCTION = 'function';
@@ -2065,14 +2139,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
+	     * wrap a method with a deprecation warning and stack trace
+	     * @param {Function} method
+	     * @param {String} name
+	     * @param {String} message
+	     * @returns {Function} A new function wrapping the supplied method.
+	     */
+	    function deprecate(method, name, message) {
+	        var deprecationMessage = 'DEPRECATED METHOD: ' + name + '\n' + message + ' AT \n';
+	        return function () {
+	            var e = new Error('get-stack-trace');
+	            var stack = e && e.stack ? e.stack.replace(/^[^\(]+?[\n$]/gm, '').replace(/^\s+at\s+/gm, '').replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@') : 'Unknown Stack Trace';
+
+	            var log = window.console && (window.console.warn || window.console.log);
+	            if (log) {
+	                log.call(window.console, deprecationMessage, stack);
+	            }
+	            return method.apply(this, arguments);
+	        };
+	    }
+
+	    /**
+	     * extend object.
+	     * means that properties in dest will be overwritten by the ones in src.
+	     * @param {Object} target
+	     * @param {...Object} objects_to_assign
+	     * @returns {Object} target
+	     */
+	    var assign;
+	    if (typeof Object.assign !== 'function') {
+	        assign = function assign(target) {
+	            if (target === undefined || target === null) {
+	                throw new TypeError('Cannot convert undefined or null to object');
+	            }
+
+	            var output = Object(target);
+	            for (var index = 1; index < arguments.length; index++) {
+	                var source = arguments[index];
+	                if (source !== undefined && source !== null) {
+	                    for (var nextKey in source) {
+	                        if (source.hasOwnProperty(nextKey)) {
+	                            output[nextKey] = source[nextKey];
+	                        }
+	                    }
+	                }
+	            }
+	            return output;
+	        };
+	    } else {
+	        assign = Object.assign;
+	    }
+
+	    /**
 	     * extend object.
 	     * means that properties in dest will be overwritten by the ones in src.
 	     * @param {Object} dest
 	     * @param {Object} src
-	     * @param {Boolean} [merge]
+	     * @param {Boolean} [merge=false]
 	     * @returns {Object} dest
 	     */
-	    function extend(dest, src, merge) {
+	    var extend = deprecate(function extend(dest, src, merge) {
 	        var keys = Object.keys(src);
 	        var i = 0;
 	        while (i < keys.length) {
@@ -2082,7 +2208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            i++;
 	        }
 	        return dest;
-	    }
+	    }, 'extend', 'Use `assign`.');
 
 	    /**
 	     * merge the values from src in the dest.
@@ -2091,9 +2217,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Object} src
 	     * @returns {Object} dest
 	     */
-	    function merge(dest, src) {
+	    var merge = deprecate(function merge(dest, src) {
 	        return extend(dest, src, true);
-	    }
+	    }, 'merge', 'Use `assign`.');
 
 	    /**
 	     * simple class inheritance
@@ -2110,7 +2236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        childP._super = baseP;
 
 	        if (properties) {
-	            extend(childP, properties);
+	            assign(childP, properties);
 	        }
 	    }
 
@@ -2313,8 +2439,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {DocumentView|Window}
 	     */
 	    function getWindowForElement(element) {
-	        var doc = element.ownerDocument;
-	        return doc.defaultView || doc.parentWindow;
+	        var doc = element.ownerDocument || element;
+	        return doc.defaultView || doc.parentWindow || window;
 	    }
 
 	    var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
@@ -2492,8 +2618,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        computeDeltaXY(session, input);
 	        input.offsetDirection = getDirection(input.deltaX, input.deltaY);
 
+	        var overallVelocity = getVelocity(input.deltaTime, input.deltaX, input.deltaY);
+	        input.overallVelocityX = overallVelocity.x;
+	        input.overallVelocityY = overallVelocity.y;
+	        input.overallVelocity = abs(overallVelocity.x) > abs(overallVelocity.y) ? overallVelocity.x : overallVelocity.y;
+
 	        input.scale = firstMultiple ? getScale(firstMultiple.pointers, pointers) : 1;
 	        input.rotation = firstMultiple ? getRotation(firstMultiple.pointers, pointers) : 0;
+
+	        input.maxPointers = !session.prevInput ? input.pointers.length : input.pointers.length > session.prevInput.maxPointers ? input.pointers.length : session.prevInput.maxPointers;
 
 	        computeIntervalInputData(session, input);
 
@@ -2541,8 +2674,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            direction;
 
 	        if (input.eventType != INPUT_CANCEL && (deltaTime > COMPUTE_INTERVAL || last.velocity === undefined)) {
-	            var deltaX = last.deltaX - input.deltaX;
-	            var deltaY = last.deltaY - input.deltaY;
+	            var deltaX = input.deltaX - last.deltaX;
+	            var deltaY = input.deltaY - last.deltaY;
 
 	            var v = getVelocity(deltaTime, deltaX, deltaY);
 	            velocityX = v.x;
@@ -2649,9 +2782,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (abs(x) >= abs(y)) {
-	            return x > 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+	            return x < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
 	        }
-	        return y > 0 ? DIRECTION_UP : DIRECTION_DOWN;
+	        return y < 0 ? DIRECTION_UP : DIRECTION_DOWN;
 	    }
 
 	    /**
@@ -2694,7 +2827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return {Number} rotation
 	     */
 	    function getRotation(start, end) {
-	        return getAngle(end[1], end[0], PROPS_CLIENT_XY) - getAngle(start[1], start[0], PROPS_CLIENT_XY);
+	        return getAngle(end[1], end[0], PROPS_CLIENT_XY) + getAngle(start[1], start[0], PROPS_CLIENT_XY);
 	    }
 
 	    /**
@@ -2726,7 +2859,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.evEl = MOUSE_ELEMENT_EVENTS;
 	        this.evWin = MOUSE_WINDOW_EVENTS;
 
-	        this.allow = true; // used by Input.TouchMouse to disable mouse events
 	        this.pressed = false; // mousedown state
 
 	        Input.apply(this, arguments);
@@ -2749,8 +2881,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                eventType = INPUT_END;
 	            }
 
-	            // mouse must be down, and mouse events are allowed (see the TouchMouse input)
-	            if (!this.pressed || !this.allow) {
+	            // mouse must be down
+	            if (!this.pressed) {
 	                return;
 	            }
 
@@ -2787,7 +2919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var POINTER_WINDOW_EVENTS = 'pointermove pointerup pointercancel';
 
 	    // IE10 has prefixed support, and case-sensitive
-	    if (window.MSPointerEvent) {
+	    if (window.MSPointerEvent && !window.PointerEvent) {
 	        POINTER_ELEMENT_EVENTS = 'MSPointerDown';
 	        POINTER_WINDOW_EVENTS = 'MSPointerMove MSPointerUp MSPointerCancel';
 	    }
@@ -3031,12 +3163,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @constructor
 	     * @extends Input
 	     */
+
+	    var DEDUP_TIMEOUT = 2500;
+	    var DEDUP_DISTANCE = 25;
+
 	    function TouchMouseInput() {
 	        Input.apply(this, arguments);
 
 	        var handler = bindFn(this.handler, this);
 	        this.touch = new TouchInput(this.manager, handler);
 	        this.mouse = new MouseInput(this.manager, handler);
+
+	        this.primaryTouch = null;
+	        this.lastTouches = [];
 	    }
 
 	    inherit(TouchMouseInput, Input, {
@@ -3050,17 +3189,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var isTouch = inputData.pointerType == INPUT_TYPE_TOUCH,
 	                isMouse = inputData.pointerType == INPUT_TYPE_MOUSE;
 
-	            // when we're in a touch event, so  block all upcoming mouse events
-	            // most mobile browser also emit mouseevents, right after touchstart
-	            if (isTouch) {
-	                this.mouse.allow = false;
-	            } else if (isMouse && !this.mouse.allow) {
+	            if (isMouse && inputData.sourceCapabilities && inputData.sourceCapabilities.firesTouchEvents) {
 	                return;
 	            }
 
-	            // reset the allowMouse when we're done
-	            if (inputEvent & (INPUT_END | INPUT_CANCEL)) {
-	                this.mouse.allow = true;
+	            // when we're in a touch event, record touches to  de-dupe synthetic mouse event
+	            if (isTouch) {
+	                recordTouches.call(this, inputEvent, inputData);
+	            } else if (isMouse && isSyntheticEvent.call(this, inputData)) {
+	                return;
 	            }
 
 	            this.callback(manager, inputEvent, inputData);
@@ -3075,6 +3212,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    });
 
+	    function recordTouches(eventType, eventData) {
+	        if (eventType & INPUT_START) {
+	            this.primaryTouch = eventData.changedPointers[0].identifier;
+	            setLastTouch.call(this, eventData);
+	        } else if (eventType & (INPUT_END | INPUT_CANCEL)) {
+	            setLastTouch.call(this, eventData);
+	        }
+	    }
+
+	    function setLastTouch(eventData) {
+	        var touch = eventData.changedPointers[0];
+
+	        if (touch.identifier === this.primaryTouch) {
+	            var lastTouch = { x: touch.clientX, y: touch.clientY };
+	            this.lastTouches.push(lastTouch);
+	            var lts = this.lastTouches;
+	            var removeLastTouch = function removeLastTouch() {
+	                var i = lts.indexOf(lastTouch);
+	                if (i > -1) {
+	                    lts.splice(i, 1);
+	                }
+	            };
+	            setTimeout(removeLastTouch, DEDUP_TIMEOUT);
+	        }
+	    }
+
+	    function isSyntheticEvent(eventData) {
+	        var x = eventData.srcEvent.clientX,
+	            y = eventData.srcEvent.clientY;
+	        for (var i = 0; i < this.lastTouches.length; i++) {
+	            var t = this.lastTouches[i];
+	            var dx = Math.abs(x - t.x),
+	                dy = Math.abs(y - t.y);
+	            if (dx <= DEDUP_DISTANCE && dy <= DEDUP_DISTANCE) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
 	    var PREFIXED_TOUCH_ACTION = prefixed(TEST_ELEMENT.style, 'touchAction');
 	    var NATIVE_TOUCH_ACTION = PREFIXED_TOUCH_ACTION !== undefined;
 
@@ -3085,6 +3262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var TOUCH_ACTION_NONE = 'none';
 	    var TOUCH_ACTION_PAN_X = 'pan-x';
 	    var TOUCH_ACTION_PAN_Y = 'pan-y';
+	    var TOUCH_ACTION_MAP = getTouchActionProps();
 
 	    /**
 	     * Touch Action
@@ -3109,7 +3287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                value = this.compute();
 	            }
 
-	            if (NATIVE_TOUCH_ACTION) {
+	            if (NATIVE_TOUCH_ACTION && this.manager.element.style && TOUCH_ACTION_MAP[value]) {
 	                this.manager.element.style[PREFIXED_TOUCH_ACTION] = value;
 	            }
 	            this.actions = value.toLowerCase().trim();
@@ -3141,11 +3319,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {Object} input
 	         */
 	        preventDefaults: function preventDefaults(input) {
-	            // not needed with native support for the touchAction property
-	            if (NATIVE_TOUCH_ACTION) {
-	                return;
-	            }
-
 	            var srcEvent = input.srcEvent;
 	            var direction = input.offsetDirection;
 
@@ -3156,9 +3329,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            var actions = this.actions;
-	            var hasNone = inStr(actions, TOUCH_ACTION_NONE);
-	            var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
-	            var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
+	            var hasNone = inStr(actions, TOUCH_ACTION_NONE) && !TOUCH_ACTION_MAP[TOUCH_ACTION_NONE];
+	            var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_Y];
+	            var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_X];
+
+	            if (hasNone) {
+	                //do not prevent defaults if this is a tap gesture
+
+	                var isTapPointer = input.pointers.length === 1;
+	                var isTapMovement = input.distance < 2;
+	                var isTapTouchTime = input.deltaTime < 250;
+
+	                if (isTapPointer && isTapMovement && isTapTouchTime) {
+	                    return;
+	                }
+	            }
+
+	            if (hasPanX && hasPanY) {
+	                // `pan-x pan-y` means browser handles all scrolling/panning, do not prevent
+	                return;
+	            }
 
 	            if (hasNone || hasPanY && direction & DIRECTION_HORIZONTAL || hasPanX && direction & DIRECTION_VERTICAL) {
 	                return this.preventSrc(srcEvent);
@@ -3189,9 +3379,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
 	        var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
 
-	        // pan-x and pan-y can be combined
+	        // if both pan-x and pan-y are set (different recognizers
+	        // for different directions, e.g. horizontal pan but vertical swipe?)
+	        // we need none (as otherwise with pan-x pan-y combined none of these
+	        // recognizers will work, since the browser would handle all panning
 	        if (hasPanX && hasPanY) {
-	            return TOUCH_ACTION_PAN_X + ' ' + TOUCH_ACTION_PAN_Y;
+	            return TOUCH_ACTION_NONE;
 	        }
 
 	        // pan-x OR pan-y
@@ -3205,6 +3398,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        return TOUCH_ACTION_AUTO;
+	    }
+
+	    function getTouchActionProps() {
+	        if (!NATIVE_TOUCH_ACTION) {
+	            return false;
+	        }
+	        var touchMap = {};
+	        var cssSupports = window.CSS && window.CSS.supports;
+	        ['auto', 'manipulation', 'pan-y', 'pan-x', 'pan-x pan-y', 'none'].forEach(function (val) {
+
+	            // If css.supports is not supported but there is native touch-action assume it supports
+	            // all values. This is the case for IE 10 and 11.
+	            touchMap[val] = cssSupports ? window.CSS.supports('touch-action', val) : true;
+	        });
+	        return touchMap;
 	    }
 
 	    /**
@@ -3249,10 +3457,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Object} options
 	     */
 	    function Recognizer(options) {
+	        this.options = assign({}, this.defaults, options || {});
+
 	        this.id = uniqueId();
 
 	        this.manager = null;
-	        this.options = merge(options || {}, this.defaults);
 
 	        // default is enable true
 	        this.options.enable = ifUndefined(this.options.enable, true);
@@ -3276,7 +3485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @return {Recognizer}
 	         */
 	        set: function set(options) {
-	            extend(this.options, options);
+	            assign(this.options, options);
 
 	            // also update the touchAction, in case something changed about the directions/enabled state
 	            this.manager && this.manager.touchAction.update();
@@ -3380,20 +3589,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var self = this;
 	            var state = this.state;
 
-	            function emit(withState) {
-	                self.manager.emit(self.options.event + (withState ? stateStr(state) : ''), input);
+	            function emit(event) {
+	                self.manager.emit(event, input);
 	            }
 
 	            // 'panstart' and 'panmove'
 	            if (state < STATE_ENDED) {
-	                emit(true);
+	                emit(self.options.event + stateStr(state));
 	            }
 
-	            emit(); // simple 'eventName' events
+	            emit(self.options.event); // simple 'eventName' events
+
+	            if (input.additionalEvent) {
+	                // additional event(panleft, panright, pinchin, pinchout...)
+	                emit(input.additionalEvent);
+	            }
 
 	            // panend and pancancel
 	            if (state >= STATE_ENDED) {
-	                emit(true);
+	                emit(self.options.event + stateStr(state));
 	            }
 	        },
 
@@ -3433,7 +3647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        recognize: function recognize(inputData) {
 	            // make a new copy of the inputData
 	            // so we can change the inputData without messing up the other recognizers
-	            var inputDataClone = extend({}, inputData);
+	            var inputDataClone = assign({}, inputData);
 
 	            // is is enabled and allow recognizing?
 	            if (!boolOrFn(this.options.enable, [this, inputDataClone])) {
@@ -3657,14 +3871,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 
 	        emit: function emit(input) {
+
 	            this.pX = input.deltaX;
 	            this.pY = input.deltaY;
 
 	            var direction = directionStr(input.direction);
-	            if (direction) {
-	                this.manager.emit(this.options.event + direction, input);
-	            }
 
+	            if (direction) {
+	                input.additionalEvent = this.options.event + direction;
+	            }
 	            this._super.emit.call(this, input);
 	        }
 	    });
@@ -3699,11 +3914,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 
 	        emit: function emit(input) {
-	            this._super.emit.call(this, input);
 	            if (input.scale !== 1) {
 	                var inOut = input.scale < 1 ? 'in' : 'out';
-	                this.manager.emit(this.options.event + inOut, input);
+	                input.additionalEvent = this.options.event + inOut;
 	            }
+	            this._super.emit.call(this, input);
 	        }
 	    });
 
@@ -3728,8 +3943,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        defaults: {
 	            event: 'press',
 	            pointers: 1,
-	            time: 500, // minimal time of the pointer to be pressed
-	            threshold: 5 // a minimal movement is ok, but keep it low
+	            time: 251, // minimal time of the pointer to be pressed
+	            threshold: 9 // a minimal movement is ok, but keep it low
 	        },
 
 	        getTouchAction: function getTouchAction() {
@@ -3826,7 +4041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        defaults: {
 	            event: 'swipe',
 	            threshold: 10,
-	            velocity: 0.65,
+	            velocity: 0.3,
 	            direction: DIRECTION_HORIZONTAL | DIRECTION_VERTICAL,
 	            pointers: 1
 	        },
@@ -3840,18 +4055,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var velocity;
 
 	            if (direction & (DIRECTION_HORIZONTAL | DIRECTION_VERTICAL)) {
-	                velocity = input.velocity;
+	                velocity = input.overallVelocity;
 	            } else if (direction & DIRECTION_HORIZONTAL) {
-	                velocity = input.velocityX;
+	                velocity = input.overallVelocityX;
 	            } else if (direction & DIRECTION_VERTICAL) {
-	                velocity = input.velocityY;
+	                velocity = input.overallVelocityY;
 	            }
 
-	            return this._super.attrTest.call(this, input) && direction & input.direction && input.distance > this.options.threshold && abs(velocity) > this.options.velocity && input.eventType & INPUT_END;
+	            return this._super.attrTest.call(this, input) && direction & input.offsetDirection && input.distance > this.options.threshold && input.maxPointers == this.options.pointers && abs(velocity) > this.options.velocity && input.eventType & INPUT_END;
 	        },
 
 	        emit: function emit(input) {
-	            var direction = directionStr(input.direction);
+	            var direction = directionStr(input.offsetDirection);
 	            if (direction) {
 	                this.manager.emit(this.options.event + direction, input);
 	            }
@@ -3894,7 +4109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            taps: 1,
 	            interval: 300, // max time between the multi-tap taps
 	            time: 250, // max time of the pointer to be down (like finger on the screen)
-	            threshold: 2, // a minimal movement is ok, but keep it low
+	            threshold: 9, // a minimal movement is ok, but keep it low
 	            posThreshold: 10 // a multi-tap can be a bit off the initial position
 	        },
 
@@ -3976,7 +4191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 
 	    /**
-	     * Simple way to create an manager with a default set of recognizers.
+	     * Simple way to create a manager with a default set of recognizers.
 	     * @param {HTMLElement} element
 	     * @param {Object} [options]
 	     * @constructor
@@ -3990,7 +4205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * @const {string}
 	     */
-	    Hammer.VERSION = '2.0.4';
+	    Hammer.VERSION = '2.0.7';
 
 	    /**
 	     * default settings
@@ -4107,14 +4322,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @constructor
 	     */
 	    function Manager(element, options) {
-	        options = options || {};
+	        this.options = assign({}, Hammer.defaults, options || {});
 
-	        this.options = merge(options, Hammer.defaults);
 	        this.options.inputTarget = this.options.inputTarget || element;
 
 	        this.handlers = {};
 	        this.session = {};
 	        this.recognizers = [];
+	        this.oldCssProps = {};
 
 	        this.element = element;
 	        this.input = createInputInstance(this);
@@ -4122,7 +4337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        toggleCssProps(this, true);
 
-	        each(options.recognizers, function (item) {
+	        each(this.options.recognizers, function (item) {
 	            var recognizer = this.add(new item[0](item[1]));
 	            item[2] && recognizer.recognizeWith(item[2]);
 	            item[3] && recognizer.requireFailure(item[3]);
@@ -4136,7 +4351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @returns {Manager}
 	         */
 	        set: function set(options) {
-	            extend(this.options, options);
+	            assign(this.options, options);
 
 	            // Options that need a little more setup
 	            if (options.touchAction) {
@@ -4271,11 +4486,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return this;
 	            }
 
-	            var recognizers = this.recognizers;
 	            recognizer = this.get(recognizer);
-	            recognizers.splice(inArray(recognizers, recognizer), 1);
 
-	            this.touchAction.update();
+	            // let's make sure this recognizer exists
+	            if (recognizer) {
+	                var recognizers = this.recognizers;
+	                var index = inArray(recognizers, recognizer);
+
+	                if (index !== -1) {
+	                    recognizers.splice(index, 1);
+	                    this.touchAction.update();
+	                }
+	            }
+
 	            return this;
 	        },
 
@@ -4286,6 +4509,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @returns {EventEmitter} this
 	         */
 	        on: function on(events, handler) {
+	            if (events === undefined) {
+	                return;
+	            }
+	            if (handler === undefined) {
+	                return;
+	            }
+
 	            var handlers = this.handlers;
 	            each(splitStr(events), function (event) {
 	                handlers[event] = handlers[event] || [];
@@ -4301,12 +4531,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @returns {EventEmitter} this
 	         */
 	        off: function off(events, handler) {
+	            if (events === undefined) {
+	                return;
+	            }
+
 	            var handlers = this.handlers;
 	            each(splitStr(events), function (event) {
 	                if (!handler) {
 	                    delete handlers[event];
 	                } else {
-	                    handlers[event].splice(inArray(handlers[event], handler), 1);
+	                    handlers[event] && handlers[event].splice(inArray(handlers[event], handler), 1);
 	                }
 	            });
 	            return this;
@@ -4362,9 +4596,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    function toggleCssProps(manager, add) {
 	        var element = manager.element;
+	        if (!element.style) {
+	            return;
+	        }
+	        var prop;
 	        each(manager.options.cssProps, function (value, name) {
-	            element.style[prefixed(element.style, name)] = add ? value : '';
+	            prop = prefixed(element.style, name);
+	            if (add) {
+	                manager.oldCssProps[prop] = element.style[prop];
+	                element.style[prop] = value;
+	            } else {
+	                element.style[prop] = manager.oldCssProps[prop] || '';
+	            }
 	        });
+	        if (!add) {
+	            manager.oldCssProps = {};
+	        }
 	    }
 
 	    /**
@@ -4379,7 +4626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        data.target.dispatchEvent(gestureEvent);
 	    }
 
-	    extend(Hammer, {
+	    assign(Hammer, {
 	        INPUT_START: INPUT_START,
 	        INPUT_MOVE: INPUT_MOVE,
 	        INPUT_END: INPUT_END,
@@ -4426,12 +4673,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        each: each,
 	        merge: merge,
 	        extend: extend,
+	        assign: assign,
 	        inherit: inherit,
 	        bindFn: bindFn,
 	        prefixed: prefixed
 	    });
 
-	    if ("function" == TYPE_FUNCTION && __webpack_require__(6)) {
+	    // this prevents errors when Hammer is loaded in the presence of an AMD
+	    //  style loader but by script tag, not by the loader.
+	    var freeGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : {}; // jshint ignore:line
+	    freeGlobal.Hammer = Hammer;
+
+	    if (true) {
 	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 	            return Hammer;
 	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -4444,14 +4697,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
-
-	/* WEBPACK VAR INJECTION */}.call(exports, {}))
-
-/***/ },
-/* 7 */
 /***/ function(module, exports) {
 
 	/*jshint esnext: true */
@@ -4473,7 +4718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (data) this.data = data;
 	        this.async = async ? this.async = async : this.async = true;
 
-	        if (window.XMLHttpRequest) this.req = new XMLHttpRequest();else this.req = new ActiveXObject('Microsoft.XMLHTTP');
+	        if (window.XMLHttpRequest) this.req = new XMLHttpRequest();else this.req = new ActiveXObject("Microsoft.XMLHTTP");
 	    }
 
 	    _createClass(Ajax, [{
@@ -4489,7 +4734,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (typeof $.data !== 'undefined' && $.data !== null) $.url = $.url + '?' + $.data;
 
 	                req.open(method, $.url, $.async);
-	                req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	                req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 	                req.onload = function (event) {
 	                    if (this.status == 200) {
 	                        $.response = JSON.parse(this.responseText);
@@ -4501,7 +4746,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                // Handle network errors
 	                req.onerror = function () {
-	                    reject(Error('Network Error'));
+	                    reject(Error("Network Error"));
 	                };
 
 	                req.send();
@@ -4527,20 +4772,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                req.open(method, $.url, $.async);
-	                req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	                req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 	                req.onload = function (event) {
 	                    if (this.status == 200) {
 	                        var response = JSON.parse(this.response);
-	                        var blob = b64toBlob(response.blob, response.type);
-	                        var urlCreator = window.URL || window.webkitURL;
 
 	                        $.response = {
-	                            blob: blob,
-	                            imageURL: urlCreator.createObjectURL(blob),
-	                            clickURL: response.clickURL,
+	                            type: response.type,
 	                            adID: response.ad_id,
 	                            campaignID: response.campaign_id
 	                        };
+
+	                        if (response.type === 'adNetwork') {
+	                            $.response.adNetworkEmbed = response.adnetwork_embed;
+	                        } else {
+	                            var blob = b64toBlob(response.blob, response.type);
+	                            var urlCreator = window.URL || window.webkitURL;
+
+	                            $.response.blob = blob;
+	                            $.response.imageURL = urlCreator.createObjectURL(blob);
+	                            $.response.clickURL = response.clickURL;
+	                        }
 
 	                        resolve($.response);
 	                    } else {
@@ -4550,7 +4802,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                // Handle network errors
 	                req.onerror = function () {
-	                    reject(Error('Network Error'));
+	                    reject(Error("Network Error"));
 	                };
 
 	                req.send();
@@ -4567,8 +4819,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (!$.url) reject(Error('No URL Set'));
 
 	                req.open(method, $.url, $.async);
-	                req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-	                req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	                req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	                req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 	                req.onload = function (event) {
 	                    if (this.status == 200) {
 	                        $.response = JSON.parse(this.responseText);
@@ -4580,7 +4832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                // Handle network errors
 	                req.onerror = function () {
-	                    reject(Error('Network Error'));
+	                    reject(Error("Network Error"));
 	                };
 
 	                req.send(JSON.stringify(data));
@@ -4619,11 +4871,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * UAParser.js v0.7.9
+	 * UAParser.js v0.7.10
 	 * Lightweight JavaScript-based User-Agent string parser
 	 * https://github.com/faisalman/ua-parser-js
 	 *
@@ -4641,7 +4893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Constants
 	    /////////////
 
-	    var LIBVERSION = '0.7.9',
+	    var LIBVERSION = '0.7.10',
 	        EMPTY = '',
 	        UNKNOWN = '?',
 	        FUNC_TYPE = 'function',
@@ -4670,14 +4922,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var util = {
 	        extend: function extend(regexes, extensions) {
 	            for (var i in extensions) {
-	                if ('browser cpu device engine os'.indexOf(i) !== -1 && extensions[i].length % 2 === 0) {
+	                if ("browser cpu device engine os".indexOf(i) !== -1 && extensions[i].length % 2 === 0) {
 	                    regexes[i] = extensions[i].concat(regexes[i]);
 	                }
 	            }
 	            return regexes;
 	        },
 	        has: function has(str1, str2) {
-	            if (typeof str1 === 'string') {
+	            if (typeof str1 === "string") {
 	                return str2.toLowerCase().indexOf(str1.toLowerCase()) !== -1;
 	            } else {
 	                return false;
@@ -4687,7 +4939,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return str.toLowerCase();
 	        },
 	        major: function major(version) {
-	            return typeof version === STR_TYPE ? version.split('.')[0] : undefined;
+	            return typeof version === STR_TYPE ? version.split(".")[0] : undefined;
 	        }
 	    };
 
@@ -4720,11 +4972,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (typeof result === UNDEF_TYPE) {
 	                    result = {};
 	                    for (p in props) {
-	                        q = props[p];
-	                        if (typeof q === OBJ_TYPE) {
-	                            result[q[0]] = undefined;
-	                        } else {
-	                            result[q] = undefined;
+	                        if (props.hasOwnProperty(p)) {
+	                            q = props[p];
+	                            if (typeof q === OBJ_TYPE) {
+	                                result[q[0]] = undefined;
+	                            } else {
+	                                result[q] = undefined;
+	                            }
 	                        }
 	                    }
 	                }
@@ -4874,22 +5128,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Webkit/KHTML based
 	        /(rekonq)\/([\w\.]+)*/i, // Rekonq
-	        /(chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium)\/([\w\.-]+)/i
-	        // Chromium/Flock/RockMelt/Midori/Epiphany/Silk/Skyfire/Bolt/Iron/Iridium
+	        /(chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs)\/([\w\.-]+)/i
+	        // Chromium/Flock/RockMelt/Midori/Epiphany/Silk/Skyfire/Bolt/Iron/Iridium/PhantomJS
 	        ], [NAME, VERSION], [/(trident).+rv[:\s]([\w\.]+).+like\sgecko/i // IE11
 	        ], [[NAME, 'IE'], VERSION], [/(edge)\/((\d+)?[\w\.]+)/i // Microsoft Edge
 	        ], [NAME, VERSION], [/(yabrowser)\/([\w\.]+)/i // Yandex
 	        ], [[NAME, 'Yandex'], VERSION], [/(comodo_dragon)\/([\w\.]+)/i // Comodo Dragon
 	        ], [[NAME, /_/g, ' '], VERSION], [/(chrome|omniweb|arora|[tizenoka]{5}\s?browser)\/v?([\w\.]+)/i,
 	        // Chrome/OmniWeb/Arora/Tizen/Nokia
-	        /(uc\s?browser|qqbrowser)[\/\s]?([\w\.]+)/i
-	        // UCBrowser/QQBrowser
-	        ], [NAME, VERSION], [/(dolfin)\/([\w\.]+)/i // Dolphin
+	        /(qqbrowser)[\/\s]?([\w\.]+)/i
+	        // QQBrowser
+	        ], [NAME, VERSION], [/(uc\s?browser)[\/\s]?([\w\.]+)/i, /ucweb.+(ucbrowser)[\/\s]?([\w\.]+)/i, /JUC.+(ucweb)[\/\s]?([\w\.]+)/i
+	        // UCBrowser
+	        ], [[NAME, 'UCBrowser'], VERSION], [/(dolfin)\/([\w\.]+)/i // Dolphin
 	        ], [[NAME, 'Dolphin'], VERSION], [/((?:android.+)crmo|crios)\/([\w\.]+)/i // Chrome for Android/iOS
 	        ], [[NAME, 'Chrome'], VERSION], [/XiaoMi\/MiuiBrowser\/([\w\.]+)/i // MIUI Browser
 	        ], [VERSION, [NAME, 'MIUI Browser']], [/android.+version\/([\w\.]+)\s+(?:mobile\s?safari|safari)/i // Android Browser
 	        ], [VERSION, [NAME, 'Android Browser']], [/FBAV\/([\w\.]+);/i // Facebook App for iOS
-	        ], [VERSION, [NAME, 'Facebook']], [/version\/([\w\.]+).+?mobile\/\w+\s(safari)/i // Mobile Safari
+	        ], [VERSION, [NAME, 'Facebook']], [/fxios\/([\w\.-]+)/i // Firefox for iOS
+	        ], [VERSION, [NAME, 'Firefox']], [/version\/([\w\.]+).+?mobile\/\w+\s(safari)/i // Mobile Safari
 	        ], [VERSION, [NAME, 'Mobile Safari']], [/version\/([\w\.]+).+?(mobile\s?safari|safari)/i // Safari & Safari Mobile
 	        ], [VERSION, NAME], [/webkit.+?(mobile\s?safari|safari)(\/[\w\.]+)/i // Safari < 3.0
 	        ], [NAME, [VERSION, mapper.str, maps.browser.oldsafari.version]], [/(konqueror)\/([\w\.]+)/i, // Konqueror
@@ -4897,8 +5154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Gecko based
 	        /(navigator|netscape)\/([\w\.-]+)/i // Netscape
-	        ], [[NAME, 'Netscape'], VERSION], [/fxios\/([\w\.-]+)/i // Firefox for iOS
-	        ], [VERSION, [NAME, 'Firefox']], [/(swiftfox)/i, // Swiftfox
+	        ], [[NAME, 'Netscape'], VERSION], [/(swiftfox)/i, // Swiftfox
 	        /(icedragon|iceweasel|camino|chimera|fennec|maemo\sbrowser|minimo|conkeror)[\/\s]?([\w\.\+]+)/i,
 	        // IceDragon/Iceweasel/Camino/Chimera/Fennec/Maemo/Minimo/Conkeror
 	        /(firefox|seamonkey|k-meleon|icecat|iceape|firebird|phoenix)\/([\w\.-]+)/i,
@@ -4906,8 +5162,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /(mozilla)\/([\w\.]+).+rv\:.+gecko\/\d+/i, // Mozilla
 
 	        // Other
-	        /(polaris|lynx|dillo|icab|doris|amaya|w3m|netsurf)[\/\s]?([\w\.]+)/i,
-	        // Polaris/Lynx/Dillo/iCab/Doris/Amaya/w3m/NetSurf
+	        /(polaris|lynx|dillo|icab|doris|amaya|w3m|netsurf|sleipnir)[\/\s]?([\w\.]+)/i,
+	        // Polaris/Lynx/Dillo/iCab/Doris/Amaya/w3m/NetSurf/Sleipnir
 	        /(links)\s\(([\w\.]+)/i, // Links
 	        /(gobrowser)\/?([\w\.]+)*/i, // GoBrowser
 	        /(ice\s?browser)\/v?([\w\._]+)/i, // ICE Browser
@@ -5036,7 +5292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /(sony)?(?:sgp.+)\sbuild\//i], [[VENDOR, 'Sony'], [MODEL, 'Xperia Tablet'], [TYPE, TABLET]], [/(?:sony)?(?:(?:(?:c|d)\d{4})|(?:so[-l].+))\sbuild\//i], [[VENDOR, 'Sony'], [MODEL, 'Xperia Phone'], [TYPE, MOBILE]], [/\s(ouya)\s/i, // Ouya
 	        /(nintendo)\s([wids3u]+)/i // Nintendo
 	        ], [VENDOR, MODEL, [TYPE, CONSOLE]], [/android.+;\s(shield)\sbuild/i // Nvidia
-	        ], [MODEL, [VENDOR, 'Nvidia'], [TYPE, CONSOLE]], [/(playstation\s[3portablevi]+)/i // Playstation
+	        ], [MODEL, [VENDOR, 'Nvidia'], [TYPE, CONSOLE]], [/(playstation\s[34portablevi]+)/i // Playstation
 	        ], [MODEL, [VENDOR, 'Sony'], [TYPE, CONSOLE]], [/(sprint\s(\w+))/i // Sprint Phones
 	        ], [[VENDOR, mapper.str, maps.device.sprint.vendor], [MODEL, mapper.str, maps.device.sprint.model], [TYPE, MOBILE]], [/(lenovo)\s?(S(?:5000|6000)+(?:[-][\w+]))/i // Lenovo tablets
 	        ], [VENDOR, MODEL, [TYPE, TABLET]], [/(htc)[;_\s-]+([\w\s]+(?=\))|\w+)*/i, // HTC
@@ -5049,7 +5305,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ], [[MODEL, /\./g, ' '], [VENDOR, 'Microsoft'], [TYPE, MOBILE]], [
 
 	        // Motorola
-	        /\s(milestone|droid(?:[2-4x]|\s(?:bionic|x2|pro|razr))?(:?\s4g)?)[\w\s]+build\//i, /mot[\s-]?(\w+)*/i, /(XT\d{3,4}) build\//i], [MODEL, [VENDOR, 'Motorola'], [TYPE, MOBILE]], [/android.+\s(mz60\d|xoom[\s2]{0,2})\sbuild\//i], [MODEL, [VENDOR, 'Motorola'], [TYPE, TABLET]], [/android.+((sch-i[89]0\d|shw-m380s|gt-p\d{4}|gt-n8000|sgh-t8[56]9|nexus 10))/i, /((SM-T\w+))/i], [[VENDOR, 'Samsung'], MODEL, [TYPE, TABLET]], [// Samsung
+	        /\s(milestone|droid(?:[2-4x]|\s(?:bionic|x2|pro|razr))?(:?\s4g)?)[\w\s]+build\//i, /mot[\s-]?(\w+)*/i, /(XT\d{3,4}) build\//i, /(nexus\s[6])/i], [MODEL, [VENDOR, 'Motorola'], [TYPE, MOBILE]], [/android.+\s(mz60\d|xoom[\s2]{0,2})\sbuild\//i], [MODEL, [VENDOR, 'Motorola'], [TYPE, TABLET]], [/android.+((sch-i[89]0\d|shw-m380s|gt-p\d{4}|gt-n8000|sgh-t8[56]9|nexus 10))/i, /((SM-T\w+))/i], [[VENDOR, 'Samsung'], MODEL, [TYPE, TABLET]], [// Samsung
 	        /((s[cgp]h-\w+|gt-\w+|galaxy\snexus|sm-n900))/i, /(sam[sung]*)[\s-]*(\w+-?[\w-]*)*/i, /sec-((sgh\w+))/i], [[VENDOR, 'Samsung'], MODEL, [TYPE, MOBILE]], [/(samsung);smarttv/i], [VENDOR, MODEL, [TYPE, SMARTTV]], [/\(dtv[\);].+(aquos)/i // Sharp
 	        ], [MODEL, [VENDOR, 'Sharp'], [TYPE, SMARTTV]], [/sie-(\w+)*/i // Siemens
 	        ], [MODEL, [VENDOR, 'Siemens'], [TYPE, MOBILE]], [/(maemo|nokia).*(n900|lumia\s\d+)/i, // Nokia
@@ -5064,7 +5320,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ], [MODEL, [VENDOR, 'Google'], [TYPE, WEARABLE]], [/android.+(\w+)\s+build\/hm\1/i, // Xiaomi Hongmi 'numeric' models
 	        /android.+(hm[\s\-_]*note?[\s_]*(?:\d\w)?)\s+build/i, // Xiaomi Hongmi
 	        /android.+(mi[\s\-_]*(?:one|one[\s_]plus)?[\s_]*(?:\d\w)?)\s+build/i // Xiaomi Mi
-	        ], [[MODEL, /_/g, ' '], [VENDOR, 'Xiaomi'], [TYPE, MOBILE]], [/(mobile|tablet);.+rv\:.+gecko\//i // Unidentifiable
+	        ], [[MODEL, /_/g, ' '], [VENDOR, 'Xiaomi'], [TYPE, MOBILE]], [/\s(tablet)[;\/\s]/i, // Unidentifiable Tablet
+	        /\s(mobile)[;\/\s]/i // Unidentifiable Mobile
 	        ], [[TYPE, util.lowerize], VENDOR, MODEL]
 
 	        /*//////////////////////////
@@ -5151,12 +5408,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ], [[NAME, 'Firefox OS'], VERSION], [
 
 	        // Console
-	        /(nintendo|playstation)\s([wids3portablevu]+)/i, // Nintendo/Playstation
+	        /(nintendo|playstation)\s([wids34portablevu]+)/i, // Nintendo/Playstation
 
 	        // GNU/Linux based
 	        /(mint)[\/\s\(]?(\w+)*/i, // Mint
 	        /(mageia|vectorlinux)[;\s]/i, // Mageia/VectorLinux
-	        /(joli|[kxln]?ubuntu|debian|[open]*suse|gentoo|arch|slackware|fedora|mandriva|centos|pclinuxos|redhat|zenwalk|linpus)[\/\s-]?([\w\.-]+)*/i,
+	        /(joli|[kxln]?ubuntu|debian|[open]*suse|gentoo|(?=\s)arch|slackware|fedora|mandriva|centos|pclinuxos|redhat|zenwalk|linpus)[\/\s-]?([\w\.-]+)*/i,
 	        // Joli/Ubuntu/Debian/SUSE/Gentoo/Arch/Slackware
 	        // Fedora/Mandriva/CentOS/PCLinuxOS/RedHat/Zenwalk/Linpus
 	        /(hurd|linux)\s?([\w\.]+)*/i, // Hurd/Linux
@@ -5170,7 +5427,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // BSD based
 	        /\s([frentopc-]{0,4}bsd|dragonfly)\s?([\w\.]+)*/i // FreeBSD/NetBSD/OpenBSD/PC-BSD/DragonFly
-	        ], [NAME, VERSION], [/(ip[honead]+)(?:.*os\s*([\w]+)*\slike\smac|;\sopera)/i // iOS
+	        ], [NAME, VERSION], [/(ip[honead]+)(?:.*os\s([\w]+)*\slike\smac|;\sopera)/i // iOS
 	        ], [[NAME, 'iOS'], [VERSION, /_/g, '.']], [/(mac\sos\sx)\s?([\w\s\.]+\w)*/i, /(macintosh|mac(?=_powerpc)\s)/i // Mac OS
 	        ], [[NAME, 'Mac OS'], [VERSION, /_/g, '.']], [
 
@@ -5277,7 +5534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        exports.UAParser = UAParser;
 	    } else {
 	        // requirejs env (optional)
-	        if ("function" === FUNC_TYPE && __webpack_require__(6)) {
+	        if ("function" === FUNC_TYPE && __webpack_require__(8)) {
 	            !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 	                return UAParser;
 	            }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -5308,6 +5565,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    }
 	})(typeof window === 'object' ? window : undefined);
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ }
 /******/ ])

@@ -155,7 +155,7 @@ class HammerAS {
             $.ad.style.transition = 'all .5s';
 
             if (response.type == 'adNetwork') {
-                //Show A Network embed
+                //Show AdNetwork embed
                 if( $.config.debug ) {
                     $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
                 } else {
