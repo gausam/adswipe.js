@@ -153,15 +153,31 @@ class HammerAS {
             }
 
             $.ad.style.transition = 'all .5s';
-            $.ad.style.backgroundImage = 'url("'+response.imageURL+'")';
-            $.ad.style.backgroundSize = 'contain';
-            $.ad.style.backgroundPosition = 'center center';
-            $.ad.style.backgroundRepeat = 'no-repeat';
+
+            if (response.type == 'adNetwork') {
+                //Show A Network embed
+                if( $.config.debug ) {
+                    $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
+                } else {
+                    $.ad.innerHTML = response.adNetworkEmbed;
+                }
+
+            } else {
+                //Show Image Ad
+                $.ad.style.backgroundImage = 'url("'+response.imageURL+'")';
+                $.ad.style.backgroundSize = 'contain';
+                $.ad.style.backgroundPosition = 'center center';
+                $.ad.style.backgroundRepeat = 'no-repeat';
+            }
+
             $.ad.style.width = $.width + 'px';
             $.ad.style.height = $.height + 'px';
             $.ad.style.position = 'fixed';
             $.ad.style.top = '0px';
             $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg
+
+            //Run any scripts in the embedded ad (for Ad Network ads)
+            if (response.type == 'adNetwork') $.util.executeScripts($.ad);
 
             $.q.style.transition = 'all .5s';
             $.q.style.color = 'rgb(181, 181, 181)';
