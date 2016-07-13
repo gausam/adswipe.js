@@ -64,16 +64,23 @@ class Ajax {
             req.onload = function(event) {
                 if( this.status == 200 ) {
                     var response = JSON.parse(this.response);
-                    var blob = b64toBlob(response.blob, response.type);
-                    var urlCreator = window.URL || window.webkitURL;
 
                     $.response = {
-                        blob: blob,
-                        imageURL: urlCreator.createObjectURL( blob ),
-                        clickURL: response.clickURL,
+                        type: response.type,
                         adID: response.ad_id,
                         campaignID: response.campaign_id
                     };
+
+                    if (response.type === 'adNetwork') {
+                        $.response.adNetworkEmbed = response.adnetwork_embed;
+                    } else {
+                        var blob = b64toBlob(response.blob, response.type);
+                        var urlCreator = window.URL || window.webkitURL;
+
+                        $.response.blob = blob;
+                        $.response.imageURL = urlCreator.createObjectURL( blob );
+                        $.response.clickURL = response.clickURL;
+                    }
 
                     resolve($.response);
                 } else {
