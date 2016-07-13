@@ -451,9 +451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            for (i = 0; scripts[i]; i++) {
 	                script = scripts[i];
-	                if (script.parentNode) {
-	                    script.parentNode.removeChild(script);
-	                }
+	                //if (script.parentNode) {script.parentNode.removeChild(script);}
 	                evalScript(scripts[i]);
 	            }
 	        }
@@ -1776,7 +1774,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.ad.style.transition = 'all .5s';
 
 	                if (response.type == 'adNetwork') {
-	                    console.log('AdNetwork stuff', response.adNetworkEmbed);
 	                    //Show AdNetwork embed
 	                    if ($.config.debug) {
 	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;

@@ -135,7 +135,7 @@ class Util {
 
       for (i = 0; scripts[i]; i++) {
         script = scripts[i];
-        if (script.parentNode) {script.parentNode.removeChild(script);}
+        //if (script.parentNode) {script.parentNode.removeChild(script);}
         evalScript(scripts[i]);
       }
     }
