@@ -175,7 +175,9 @@ class HammerAS {
             $.ad.style.height = $.height + 'px';
             $.ad.style.position = 'fixed';
             $.ad.style.top = '0px';
-            $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg
+            // make sure this is on top of $.bg
+            //$.ad.style.zIndex = $.util.findNextZIndex();
+            $.ad.style.zIndex = 16777271;
 
             //Run any scripts in the embedded ad (for Ad Network ads)
             if (response.type == 'adNetwork') $.util.executeScripts($.ad);
@@ -192,8 +194,8 @@ class HammerAS {
             $.q.innerHTML = `<span id="${$.config.classElement}_q" style="cursor: pointer; padding: 5px; background-color: rgba(0, 0, 0, .20);">
                                 (?)
                             </span>`;
-            $.q.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg, $.ad
-
+            // make sure this is on top of $.bg, $.ad
+            $.q.style.zIndex = $.util.findNextZIndex();
 
             var infoStyle;
             $.info.style.transition = 'all .5s';
