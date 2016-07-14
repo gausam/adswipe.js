@@ -177,7 +177,7 @@ class HammerAS {
             $.ad.style.top = '0px';
             // make sure this is on top of $.bg
             //$.ad.style.zIndex = $.util.findNextZIndex();
-            $.ad.style.zIndex = 16777271;
+            $.ad.style.zIndex = '16777271';
 
             //Run any scripts in the embedded ad (for Ad Network ads)
             if (response.type == 'adNetwork') $.util.executeScripts($.ad);
