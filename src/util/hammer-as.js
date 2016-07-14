@@ -156,6 +156,7 @@ class HammerAS {
 
             if (response.type == 'adNetwork') {
                 //Show AdNetwork embed
+                response.adNetworkEmbed = '<div>' + response.adNetworkEmbed + '</div>';
                 if( $.config.debug ) {
                     $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
                 } else {
