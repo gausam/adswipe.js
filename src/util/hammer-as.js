@@ -156,12 +156,20 @@ class HammerAS {
 
             if (response.type == 'adNetwork') {
                 //Show AdNetwork embed
-                response.adNetworkEmbed = '<div>' + response.adNetworkEmbed + '</div>';
+                var iframe = document.createElement('iframe');                
+                iframe.style.width = $.width + 'px';
+                iframe.style.height = $.height + 'px';
+                iframe.style.position = 'fixed';
+                iframe.style.top = '0px';
+                iframe.src = 'http://pay4app.github.io/gava/iframe.html';
+                $.ad.append(iframe);
+
+                /*
                 if( $.config.debug ) {
                     $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
                 } else {
                     $.ad.innerHTML = response.adNetworkEmbed;
-                }
+                }*/
 
             } else {
                 //Show Image Ad

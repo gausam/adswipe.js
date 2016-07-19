@@ -1775,24 +1775,36 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                if (response.type == 'adNetwork') {
 	                    //Show AdNetwork embed
-	                    if ($.config.debug) {
+	                    var iframe = document.createElement('iframe');
+	                    iframe.style.width = $.width + 'px';
+	                    iframe.style.height = $.height + 'px';
+	                    iframe.style.position = 'fixed';
+	                    iframe.style.top = '0px';
+	                    iframe.src = 'http://pay4app.github.io/gava/iframe.html';
+	                    $.ad.append(iframe);
+
+	                    /*
+	                     response.adNetworkEmbed = response.adNetworkEmbed;
+	                    if( $.config.debug ) {
 	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
 	                    } else {
 	                        $.ad.innerHTML = response.adNetworkEmbed;
-	                    }
+	                    }*/
 	                } else {
-	                    //Show Image Ad
-	                    $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
-	                    $.ad.style.backgroundSize = 'contain';
-	                    $.ad.style.backgroundPosition = 'center center';
-	                    $.ad.style.backgroundRepeat = 'no-repeat';
-	                }
+	                        //Show Image Ad
+	                        $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
+	                        $.ad.style.backgroundSize = 'contain';
+	                        $.ad.style.backgroundPosition = 'center center';
+	                        $.ad.style.backgroundRepeat = 'no-repeat';
+	                    }
 
 	                $.ad.style.width = $.width + 'px';
 	                $.ad.style.height = $.height + 'px';
 	                $.ad.style.position = 'fixed';
 	                $.ad.style.top = '0px';
-	                $.ad.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg
+	                // make sure this is on top of $.bg
+	                //$.ad.style.zIndex = $.util.findNextZIndex();
+	                $.ad.style.zIndex = '16777271';
 
 	                //Run any scripts in the embedded ad (for Ad Network ads)
 	                if (response.type == 'adNetwork') $.util.executeScripts($.ad);
@@ -1807,7 +1819,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.q.style.right = '0';
 	                $.q.style.fontSize = 'large';
 	                $.q.innerHTML = '<span id="' + $.config.classElement + '_q" style="cursor: pointer; padding: 5px; background-color: rgba(0, 0, 0, .20);">\n                                (?)\n                            </span>';
-	                $.q.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of $.bg, $.ad
+	                // make sure this is on top of $.bg, $.ad
+	                $.q.style.zIndex = $.util.findNextZIndex();
 
 	                var infoStyle;
 	                $.info.style.transition = 'all .5s';
