@@ -158,8 +158,8 @@ class HammerAS {
                 //Show AdNetwork embed
                 var iframe = document.createElement('iframe');
                 iframe.id = 'frameElement';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
+                iframe.style.width = '90%';
+                iframe.style.height = '90%';
                 iframe.style.position = 'fixed';
                 iframe.style.top = '0px';
                 iframe.src = response.adNetworkEmbed;
