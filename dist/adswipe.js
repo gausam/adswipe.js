@@ -1775,14 +1775,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                if (response.type == 'adNetwork') {
 	                    //Show AdNetwork embed
-	                    var iframe = document.createElement('iframe');
-	                    iframe.id = 'frameElement';
-	                    iframe.style.width = '90%';
-	                    iframe.style.height = '90%';
-	                    iframe.style.position = 'fixed';
-	                    iframe.style.top = '0px';
-	                    iframe.src = response.adNetworkEmbed;
-	                    $.ad.appendChild(iframe);
+	                    if ($.config.debug) {
+	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
+	                    } else {
+	                        $.ad.innerHTML = response.adNetworkEmbed;
+	                    }
+
+	                    var iframe = document.getElementById('iframeElement');
 
 	                    iframe.onload = function () {
 	                        console.log('iframe loaded');
@@ -1791,20 +1790,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            console.log('Swipe', evt);
 	                        });
 	                    };
-
-	                    /*
-	                    if( $.config.debug ) {
-	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
-	                    } else {
-	                        $.ad.innerHTML = response.adNetworkEmbed;
-	                    }*/
 	                } else {
-	                        //Show Image Ad
-	                        $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
-	                        $.ad.style.backgroundSize = 'contain';
-	                        $.ad.style.backgroundPosition = 'center center';
-	                        $.ad.style.backgroundRepeat = 'no-repeat';
-	                    }
+	                    //Show Image Ad
+	                    $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
+	                    $.ad.style.backgroundSize = 'contain';
+	                    $.ad.style.backgroundPosition = 'center center';
+	                    $.ad.style.backgroundRepeat = 'no-repeat';
+	                }
 
 	                $.ad.style.width = $.width + 'px';
 	                $.ad.style.height = $.height + 'px';

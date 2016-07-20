@@ -156,14 +156,13 @@ class HammerAS {
 
             if (response.type == 'adNetwork') {
                 //Show AdNetwork embed
-                var iframe = document.createElement('iframe');
-                iframe.id = 'frameElement';
-                iframe.style.width = '90%';
-                iframe.style.height = '90%';
-                iframe.style.position = 'fixed';
-                iframe.style.top = '0px';
-                iframe.src = response.adNetworkEmbed;
-                $.ad.appendChild(iframe);
+                if( $.config.debug ) {
+                    $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
+                } else {
+                    $.ad.innerHTML = response.adNetworkEmbed;
+                }
+
+                var iframe = document.getElementById('iframeElement');
 
                 iframe.onload = function () {
                     console.log('iframe loaded');
@@ -172,13 +171,6 @@ class HammerAS {
                         console.log('Swipe', evt);
                     });
                 }
-
-                /*
-                if( $.config.debug ) {
-                    $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
-                } else {
-                    $.ad.innerHTML = response.adNetworkEmbed;
-                }*/
 
             } else {
                 //Show Image Ad
