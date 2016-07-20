@@ -162,7 +162,7 @@ class HammerAS {
                 iframe.style.position = 'fixed';
                 iframe.style.top = '0px';
                 iframe.src = 'http://pay4app.github.io/gava/iframe.html';
-                $.ad.append(iframe);
+                $.ad.appendChild(iframe);
 
                 /*
                 if( $.config.debug ) {
