@@ -1781,22 +1781,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        $.ad.innerHTML = response.adNetworkEmbed;
 	                    }
 
+	                    /*
 	                    var iframe = document.getElementById('iframeElement');
-
-	                    iframe.onload = function () {
+	                     iframe.onload = function () {
 	                        console.log('iframe loaded');
 	                        var iframeBody = iframe.contentWindow.document.body;
-	                        (0, _hammer2['default'])(iframeBody).on("swipeleft swiperight", function (evt) {
+	                        Hammer(iframeBody).on("swipeleft swiperight", function(evt){
 	                            console.log('Swipe', evt);
 	                        });
-	                    };
+	                    }*/
 	                } else {
-	                    //Show Image Ad
-	                    $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
-	                    $.ad.style.backgroundSize = 'contain';
-	                    $.ad.style.backgroundPosition = 'center center';
-	                    $.ad.style.backgroundRepeat = 'no-repeat';
-	                }
+	                        //Show Image Ad
+	                        $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
+	                        $.ad.style.backgroundSize = 'contain';
+	                        $.ad.style.backgroundPosition = 'center center';
+	                        $.ad.style.backgroundRepeat = 'no-repeat';
+	                    }
 
 	                $.ad.style.width = $.width + 'px';
 	                $.ad.style.height = $.height + 'px';

@@ -162,6 +162,7 @@ class HammerAS {
                     $.ad.innerHTML = response.adNetworkEmbed;
                 }
 
+                /*
                 var iframe = document.getElementById('iframeElement');
 
                 iframe.onload = function () {
@@ -170,7 +171,7 @@ class HammerAS {
                     Hammer(iframeBody).on("swipeleft swiperight", function(evt){
                         console.log('Swipe', evt);
                     });
-                }
+                }*/
 
             } else {
                 //Show Image Ad
