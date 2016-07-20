@@ -1780,11 +1780,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    iframe.style.height = $.height + 'px';
 	                    iframe.style.position = 'fixed';
 	                    iframe.style.top = '0px';
-	                    iframe.src = 'http://pay4app.github.io/gava/iframe.html';
-	                    $.ad.append(iframe);
+	                    iframe.src = response.adNetworkEmbed;
+	                    $.ad.appendChild(iframe);
 
 	                    /*
-	                     response.adNetworkEmbed = response.adNetworkEmbed;
 	                    if( $.config.debug ) {
 	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
 	                    } else {
