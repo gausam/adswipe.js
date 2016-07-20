@@ -1774,27 +1774,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.ad.style.transition = 'all .5s';
 
 	                if (response.type == 'adNetwork') {
-	                    /*Show AdNetwork embed
-	                    var iframe = document.createElement('iframe');                
-	                    iframe.style.width = $.width + 'px';
-	                    iframe.style.height = $.height + 'px';
+	                    //Show AdNetwork embed
+	                    var iframe = document.createElement('iframe');
+	                    iframe.id = 'frameElement';
+	                    iframe.style.width = '100%';
+	                    iframe.style.height = '100%';
 	                    iframe.style.position = 'fixed';
 	                    iframe.style.top = '0px';
 	                    iframe.src = response.adNetworkEmbed;
-	                    $.ad.appendChild(iframe);*/
+	                    $.ad.appendChild(iframe);
 
-	                    if ($.config.debug) {
+	                    iframe.onload = function () {
+	                        var iframeBody = iframe.contentWindow.document.body;
+	                        (0, _hammer2['default'])(iframeBody).on("swipeleft swiperight", $.onSwipe.bind(this));
+	                    };
+
+	                    /*
+	                    if( $.config.debug ) {
 	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
 	                    } else {
 	                        $.ad.innerHTML = response.adNetworkEmbed;
-	                    }
+	                    }*/
 	                } else {
-	                    //Show Image Ad
-	                    $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
-	                    $.ad.style.backgroundSize = 'contain';
-	                    $.ad.style.backgroundPosition = 'center center';
-	                    $.ad.style.backgroundRepeat = 'no-repeat';
-	                }
+	                        //Show Image Ad
+	                        $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
+	                        $.ad.style.backgroundSize = 'contain';
+	                        $.ad.style.backgroundPosition = 'center center';
+	                        $.ad.style.backgroundRepeat = 'no-repeat';
+	                    }
 
 	                $.ad.style.width = $.width + 'px';
 	                $.ad.style.height = $.height + 'px';
