@@ -166,8 +166,11 @@ class HammerAS {
                 $.ad.appendChild(iframe);
 
                 iframe.onload = function () {
+                    console.log('iframe loaded');
                     var iframeBody = iframe.contentWindow.document.body;
-                    Hammer(iframeBody).on("swipeleft swiperight", $.onSwipe.bind(this));
+                    Hammer(iframeBody).on("swipeleft swiperight", function(evt){
+                        console.log('Swipe', evt);
+                    });
                 }
 
                 /*
