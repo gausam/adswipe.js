@@ -155,21 +155,20 @@ class HammerAS {
             $.ad.style.transition = 'all .5s';
 
             if (response.type == 'adNetwork') {
-                //Show AdNetwork embed
+                /*Show AdNetwork embed
                 var iframe = document.createElement('iframe');                
                 iframe.style.width = $.width + 'px';
                 iframe.style.height = $.height + 'px';
                 iframe.style.position = 'fixed';
                 iframe.style.top = '0px';
                 iframe.src = response.adNetworkEmbed;
-                $.ad.appendChild(iframe);
+                $.ad.appendChild(iframe);*/
 
-                /*
                 if( $.config.debug ) {
                     $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
                 } else {
                     $.ad.innerHTML = response.adNetworkEmbed;
-                }*/
+                }
 
             } else {
                 //Show Image Ad
