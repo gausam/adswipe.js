@@ -71,9 +71,8 @@ class Ajax {
                         campaignID: response.campaign_id
                     };
 
-                    if (response.type === 'adNetwork') {
-                        $.response.adNetworkEmbed = response.adnetwork_embed;
-                    } else {
+                    if (response.type !== 'adNetwork') {
+                    
                         var blob = b64toBlob(response.blob, response.type);
                         var urlCreator = window.URL || window.webkitURL;
 

@@ -1633,6 +1633,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.ad = null;
 	        this.bg = null;
 	        this.mc = null;
+	        this.adNetworkGestureCapture = null;
 
 	        this.start_x = 0;
 	        this.start_y = 0;
@@ -1650,6 +1651,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'setup',
 	        value: function setup(callback) {
 	            var $ = this;
+
+	            //Geture capture layer for Ad Networks ads
+	            $.adNetworkGestureCapture = document.createElement('div');
+	            $.adNetworkGestureCapture.setAttribute("class", $.config.classElement + '_adnetwork');
+	            $.adNetworkGestureCapture.style.opacity = 0;
+	            $.adNetworkGestureCapture.style.backgroundColor = 'transparent';
+	            document.body.appendChild($.adNetworkGestureCapture);
 
 	            // add 'adswipe' div node
 	            $.ad = document.createElement('div');
@@ -1718,9 +1726,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'show',
 	        value: function show(asid) {
+	            var _this = this;
+
 	            var $ = this;
 
-	            // if Adswipe element removed, action has already been taken on this capaign, do not repeat
+	            // if Adswipe element removed, action has already been taken on this campaign, do not repeat
 	            if (!$.ad) return false;
 
 	            $.config.asid = asid;
@@ -1774,39 +1784,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.ad.style.transition = 'all .5s';
 
 	                if (response.type == 'adNetwork') {
-	                    //Show AdNetwork embed
-	                    if ($.config.debug) {
-	                        $.ad.innerHTML = $.ad.innerHTML + response.adNetworkEmbed;
-	                    } else {
-	                        $.ad.innerHTML = response.adNetworkEmbed;
-	                    }
 
-	                    /*
-	                    var iframe = document.getElementById('iframeElement');
-	                     iframe.onload = function () {
-	                        console.log('iframe loaded');
-	                        var iframeBody = iframe.contentWindow.document.body;
-	                        Hammer(iframeBody).on("swipeleft swiperight", function(evt){
-	                            console.log('Swipe', evt);
-	                        });
-	                    }*/
+	                    //Create iframe
+	                    var iframe = document.createElement('iframe');
+	                    iframe.style.width = $.width + 'px';
+	                    iframe.style.height = $.height + 'px';
+	                    iframe.style.frameborder = 0;
+	                    iframe.style.borderStyle = 'none';
+	                    iframe.src = $.config.endpoint + 'iframe/' + response.adID;
+
+	                    //Add iframe to page
+	                    $.ad.appendChild(iframe);
+
+	                    //Size up gesture capture layer
+	                    $.adNetworkGestureCapture.style.width = $.width + 'px';
+	                    $.adNetworkGestureCapture.style.height = $.height + 'px';
+	                    $.adNetworkGestureCapture.style.position = 'fixed';
+	                    $.adNetworkGestureCapture.style.top = '0px';
+
+	                    var gestureCaptureHammer = new _hammer2['default'].Manager($.adNetworkGestureCapture);
+	                    gestureCaptureHammer.add(new _hammer2['default'].Pan());
+	                    gestureCaptureHammer.add(new _hammer2['default'].Swipe({
+	                        threshold: 5,
+	                        velocity: 0.2
+	                    })).recognizeWith(gestureCaptureHammer.get('pan'));
+	                    gestureCaptureHammer.add(new _hammer2['default'].Tap());
+
+	                    gestureCaptureHammer.on("swipeleft swiperight", $.onSwipe.bind(_this));
+	                    gestureCaptureHammer.on("panleft panright panend", $.onPan.bind(_this));
+
+	                    //Remove gesture capture layer on tap
+	                    gestureCaptureHammer.on("tap", function () {
+	                        $.adNetworkGestureCapture.style.zIndex = 0;
+	                    });
+
+	                    //Add debug info to gesture capture layer
+	                    if ($.config.debug) $.adNetworkGestureCapture.innerHTML = debugData;
 	                } else {
-	                        //Show Image Ad
-	                        $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
-	                        $.ad.style.backgroundSize = 'contain';
-	                        $.ad.style.backgroundPosition = 'center center';
-	                        $.ad.style.backgroundRepeat = 'no-repeat';
-	                    }
+	                    //Show Image Ad
+	                    $.ad.style.backgroundImage = 'url("' + response.imageURL + '")';
+	                    $.ad.style.backgroundSize = 'contain';
+	                    $.ad.style.backgroundPosition = 'center center';
+	                    $.ad.style.backgroundRepeat = 'no-repeat';
+	                }
 
 	                $.ad.style.width = $.width + 'px';
 	                $.ad.style.height = $.height + 'px';
 	                $.ad.style.position = 'fixed';
 	                $.ad.style.top = '0px';
-	                // make sure this is on top of $.bg
+	                // make sure this is on top of $.bg  
 	                $.ad.style.zIndex = $.util.findNextZIndex();
 
-	                //Run any scripts in the embedded ad (for Ad Network ads)
-	                if (response.type == 'adNetwork') $.util.executeScripts($.ad);
+	                $.adNetworkGestureCapture.style.zIndex = 10000000; //@todo
 
 	                $.q.style.transition = 'all .5s';
 	                $.q.style.color = 'rgb(181, 181, 181)';
@@ -4792,9 +4821,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            campaignID: response.campaign_id
 	                        };
 
-	                        if (response.type === 'adNetwork') {
-	                            $.response.adNetworkEmbed = response.adnetwork_embed;
-	                        } else {
+	                        if (response.type !== 'adNetwork') {
+
 	                            var blob = b64toBlob(response.blob, response.type);
 	                            var urlCreator = window.URL || window.webkitURL;
 
