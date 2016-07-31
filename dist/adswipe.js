@@ -1952,8 +1952,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'onPanGestureCaptureLayer',
 	        value: function onPanGestureCaptureLayer(ev) {
+	            var $ = this;
 	            $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
-	            onPan(ev);
+	            $.onPan(ev);
 	        }
 	    }, {
 	        key: 'onPan',
@@ -1985,8 +1986,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'onSwipeGestureCaptureLayer',
 	        value: function onSwipeGestureCaptureLayer(ev) {
+	            var $ = this;
 	            $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
-	            onSwipe(ev);
+	            $.onSwipe(ev);
 	        }
 	    }, {
 	        key: 'onSwipe',
@@ -2015,6 +2017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'onTapGestureCaptureLayer',
 	        value: function onTapGestureCaptureLayer(ev) {
+	            var $ = this;
 	            //Remove gesture capture layer on tap
 	            $.adNetworkGestureCapture.style.zIndex = -10;
 

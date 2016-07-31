@@ -362,8 +362,9 @@ class HammerAS {
      * It simply removes the gesture capture layer, and passes the event on
      */
     onPanGestureCaptureLayer(ev) {
+        var $ = this;
         $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
-        onPan(ev);
+        $.onPan(ev);
     }
 
     onPan(ev) {
@@ -392,8 +393,9 @@ class HammerAS {
      * It simply removes the gesture capture layer, and passes the event on
      */
     onSwipeGestureCaptureLayer(ev) {
+        var $ = this;
         $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
-        onSwipe(ev);
+        $.onSwipe(ev);
     }
 
     onSwipe(ev) {
@@ -419,6 +421,7 @@ class HammerAS {
      * It simply removes the gesture capture layer
      */
     onTapGestureCaptureLayer(ev) {
+        var $ = this;
         //Remove gesture capture layer on tap
         $.adNetworkGestureCapture.style.zIndex = -10;
 
