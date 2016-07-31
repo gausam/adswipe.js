@@ -457,6 +457,7 @@ class HammerAS {
 
         update.post(data).then((response) => {
 
+            //Except in the case of an ad network iframe tap (user must be able to tap content), remove all ad code
             if ($.showingAdNetwork && action === 'tap') return;
 
             $.remove( function() {

@@ -2051,6 +2051,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            update.post(data).then(function (response) {
 
+	                //Except in the case of an ad network iframe tap (user must be able to tap content), remove all ad code
 	                if ($.showingAdNetwork && action === 'tap') return;
 
 	                $.remove(function () {
