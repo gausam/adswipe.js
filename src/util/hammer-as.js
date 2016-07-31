@@ -457,10 +457,10 @@ class HammerAS {
 
         update.post(data).then((response) => {
 
-            if ($.showingAdNetwork) return;
+            if ($.showingAdNetwork && action === 'tap') return;
 
-            $.remove(function(){
-                if( action === 'tap') {
+            $.remove( function() {
+                if( action === 'tap' && !$.showingAdNetwork) {
                     window.location.href = $.config.clickURL;
                 }
             });

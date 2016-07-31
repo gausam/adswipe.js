@@ -2051,10 +2051,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            update.post(data).then(function (response) {
 
-	                if ($.showingAdNetwork) return;
+	                if ($.showingAdNetwork && action === 'tap') return;
 
 	                $.remove(function () {
-	                    if (action === 'tap') {
+	                    if (action === 'tap' && !$.showingAdNetwork) {
 	                        window.location.href = $.config.clickURL;
 	                    }
 	                });
