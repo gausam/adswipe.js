@@ -363,7 +363,7 @@ class HammerAS {
      */
     onPanGestureCaptureLayer(ev) {
         var $ = this;
-        $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+        document.body.removeChild($.adNetworkGestureCapture);
         $.onPan(ev);
     }
 
@@ -394,7 +394,7 @@ class HammerAS {
      */
     onSwipeGestureCaptureLayer(ev) {
         var $ = this;
-        $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+        document.body.removeChild($.adNetworkGestureCapture);
         $.onSwipe(ev);
     }
 
@@ -422,10 +422,12 @@ class HammerAS {
      */
     onTapGestureCaptureLayer(ev) {
         var $ = this;
+
+        // send tap event back to server
+        $.sendAction(ev.type);
+
         //Remove gesture capture layer on tap
         $.adNetworkGestureCapture.style.zIndex = -10;
-
-        //@todo Send tap event to server
     }
 
     onTap(ev) {
