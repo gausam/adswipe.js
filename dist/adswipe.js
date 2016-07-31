@@ -2055,7 +2055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                $.remove(function () {
 	                    if (action === 'tap') {
-	                        window.open($.config.clickURL);
+	                        window.location.href = $.config.clickURL;
 	                    }
 	                });
 	            });

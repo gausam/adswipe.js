@@ -461,7 +461,7 @@ class HammerAS {
 
             $.remove(function(){
                 if( action === 'tap') {
-                    window.open($.config.clickURL);
+                    window.location.href = $.config.clickURL;
                 }
             });
         });
