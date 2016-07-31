@@ -189,11 +189,9 @@ class HammerAS {
                 })).recognizeWith(gestureCaptureHammer.get('pan'));
                 gestureCaptureHammer.add(new Hammer.Tap());
 
-                gestureCaptureHammer.on("swipeleft swiperight", $.onSwipe.bind(this));
-                gestureCaptureHammer.on("panleft panright panend", $.onPan.bind(this));
-
-                //Remove gesture capture layer on tap
-                gestureCaptureHammer.on("tap", function(){ $.adNetworkGestureCapture.style.zIndex = 0; } );
+                gestureCaptureHammer.on("swipeleft swiperight", $.onSwipeGestureCaptureLayer.bind(this));
+                gestureCaptureHammer.on("panleft panright panend", $.onPanGestureCaptureLayer.bind(this));
+                gestureCaptureHammer.on("tap", $.onTapGestureCaptureLayer.bind(this));
 
                 //Add debug info to gesture capture layer
                 if ($.config.debug) $.adNetworkGestureCapture.innerHTML = debugData;
@@ -359,6 +357,15 @@ class HammerAS {
             console.log(str);
     }
 
+    /**
+     * Event handler for gesture capture layer pan events
+     * It simply removes the gesture capture layer, and passes the event on
+     */
+    onPanGestureCaptureLayer(ev) {
+        $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+        onPan(ev);
+    }
+
     onPan(ev) {
         var $ = this;
 
@@ -380,6 +387,15 @@ class HammerAS {
         $.logEvent(ev.type);
     }
 
+    /**
+     * Event handler for gesture capture layer swipe events
+     * It simply removes the gesture capture layer, and passes the event on
+     */
+    onSwipeGestureCaptureLayer(ev) {
+        $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+        onSwipe(ev);
+    }
+
     onSwipe(ev) {
         var $ = this;
         var angle = 50;
@@ -396,6 +412,17 @@ class HammerAS {
 
         $.logEvent(ev.type);
         $.sendAction(ev.type);
+    }
+
+    /**
+     * Event handler for gesture capture layer tap events
+     * It simply removes the gesture capture layer
+     */
+    onTapGestureCaptureLayer(ev) {
+        //Remove gesture capture layer on tap
+        $.adNetworkGestureCapture.style.zIndex = -10;
+
+        //@todo Send tap event to server
     }
 
     onTap(ev) {

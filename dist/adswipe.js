@@ -1810,13 +1810,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    })).recognizeWith(gestureCaptureHammer.get('pan'));
 	                    gestureCaptureHammer.add(new _hammer2['default'].Tap());
 
-	                    gestureCaptureHammer.on("swipeleft swiperight", $.onSwipe.bind(_this));
-	                    gestureCaptureHammer.on("panleft panright panend", $.onPan.bind(_this));
-
-	                    //Remove gesture capture layer on tap
-	                    gestureCaptureHammer.on("tap", function () {
-	                        $.adNetworkGestureCapture.style.zIndex = 0;
-	                    });
+	                    gestureCaptureHammer.on("swipeleft swiperight", $.onSwipeGestureCaptureLayer.bind(_this));
+	                    gestureCaptureHammer.on("panleft panright panend", $.onPanGestureCaptureLayer.bind(_this));
+	                    gestureCaptureHammer.on("tap", $.onTapGestureCaptureLayer.bind(_this));
 
 	                    //Add debug info to gesture capture layer
 	                    if ($.config.debug) $.adNetworkGestureCapture.innerHTML = debugData;
@@ -1948,6 +1944,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var $ = this;
 	            if ($.config.debug) console.log(str);
 	        }
+
+	        /**
+	         * Event handler for gesture capture layer pan events
+	         * It simply removes the gesture capture layer, and passes the event on
+	         */
+	    }, {
+	        key: 'onPanGestureCaptureLayer',
+	        value: function onPanGestureCaptureLayer(ev) {
+	            $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+	            onPan(ev);
+	        }
 	    }, {
 	        key: 'onPan',
 	        value: function onPan(ev) {
@@ -1970,6 +1977,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            $.logEvent(ev.type);
 	        }
+
+	        /**
+	         * Event handler for gesture capture layer swipe events
+	         * It simply removes the gesture capture layer, and passes the event on
+	         */
+	    }, {
+	        key: 'onSwipeGestureCaptureLayer',
+	        value: function onSwipeGestureCaptureLayer(ev) {
+	            $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+	            onSwipe(ev);
+	        }
 	    }, {
 	        key: 'onSwipe',
 	        value: function onSwipe(ev) {
@@ -1988,6 +2006,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            $.logEvent(ev.type);
 	            $.sendAction(ev.type);
+	        }
+
+	        /**
+	         * Event handler for gesture capture layer tap events
+	         * It simply removes the gesture capture layer
+	         */
+	    }, {
+	        key: 'onTapGestureCaptureLayer',
+	        value: function onTapGestureCaptureLayer(ev) {
+	            //Remove gesture capture layer on tap
+	            $.adNetworkGestureCapture.style.zIndex = -10;
+
+	            //@todo Send tap event to server
 	        }
 	    }, {
 	        key: 'onTap',
