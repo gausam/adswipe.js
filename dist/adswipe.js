@@ -1897,6 +1897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                x = -$.ad.offsetWidth;
 	                //updateCount('left');
 	            } else if (arg === 'swiperight') {
+	                    console.log('Of-screen');
 	                    //$.ad.style.background = '#d63349'; // red
 	                    x = $.start_x + 10 + $.ad.offsetWidth;
 	                    //    updateCount('right');
@@ -1953,7 +1954,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onPanGestureCaptureLayer',
 	        value: function onPanGestureCaptureLayer(ev) {
 	            var $ = this;
-	            document.body.removeChild($.adNetworkGestureCapture);
+	            //document.body.removeChild($.adNetworkGestureCapture);
+	            console.log($.adNetworkGestureCapture);
 	            $.onPan(ev);
 	        }
 	    }, {
@@ -1987,7 +1989,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onSwipeGestureCaptureLayer',
 	        value: function onSwipeGestureCaptureLayer(ev) {
 	            var $ = this;
-	            document.body.removeChild($.adNetworkGestureCapture);
+	            //document.body.removeChild($.adNetworkGestureCapture);
 	            $.onSwipe(ev);
 	        }
 	    }, {

@@ -170,7 +170,7 @@ class HammerAS {
                 iframe.style.height = $.height + 'px';
                 iframe.style.frameborder = 0;
                 iframe.style.borderStyle = 'none';
-                iframe.src =  $.config.endpoint + 'iframe/' + response.adID;
+                iframe.src = $.config.endpoint + 'iframe/' + response.adID;
                 
                 //Add iframe to page
                 $.ad.appendChild(iframe);
@@ -305,10 +305,12 @@ class HammerAS {
         var x, y;
         if (arg === 'swipeleft') {
             //$.ad.style.background = '#42d692'; // green
+            document.body.removeChild($.adNetworkGestureCapture);
             x = -$.ad.offsetWidth;
             //updateCount('left');
-        } else if (arg === 'swiperight') {
+        } else if (arg === 'swiperight') {console.log('Of-screen');
             //$.ad.style.background = '#d63349'; // red
+            document.body.removeChild($.adNetworkGestureCapture);
             x = ($.start_x + 10) + $.ad.offsetWidth;
         //    updateCount('right');
         } else {
@@ -359,11 +361,10 @@ class HammerAS {
 
     /**
      * Event handler for gesture capture layer pan events
-     * It simply removes the gesture capture layer, and passes the event on
+     * Simply passes the event on
      */
     onPanGestureCaptureLayer(ev) {
-        var $ = this;
-        document.body.removeChild($.adNetworkGestureCapture);
+        var $ = this;        
         $.onPan(ev);
     }
 
@@ -390,11 +391,10 @@ class HammerAS {
 
     /**
      * Event handler for gesture capture layer swipe events
-     * It simply removes the gesture capture layer, and passes the event on
+     * Simply passes the event on
      */
     onSwipeGestureCaptureLayer(ev) {
         var $ = this;
-        document.body.removeChild($.adNetworkGestureCapture);
         $.onSwipe(ev);
     }
 
