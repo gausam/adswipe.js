@@ -1953,7 +1953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onPanGestureCaptureLayer',
 	        value: function onPanGestureCaptureLayer(ev) {
 	            var $ = this;
-	            $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+	            document.body.removeChild($.adNetworkGestureCapture);
 	            $.onPan(ev);
 	        }
 	    }, {
@@ -1987,7 +1987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onSwipeGestureCaptureLayer',
 	        value: function onSwipeGestureCaptureLayer(ev) {
 	            var $ = this;
-	            $.adNetworkGestureCapture.parentNode.removeChild($.adNetworkGestureCapture);
+	            document.body.removeChild($.adNetworkGestureCapture);
 	            $.onSwipe(ev);
 	        }
 	    }, {
@@ -2018,10 +2018,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onTapGestureCaptureLayer',
 	        value: function onTapGestureCaptureLayer(ev) {
 	            var $ = this;
+
+	            // send tap event back to server
+	            $.sendAction(ev.type);
+
 	            //Remove gesture capture layer on tap
 	            $.adNetworkGestureCapture.style.zIndex = -10;
-
-	            //@todo Send tap event to server
 	        }
 	    }, {
 	        key: 'onTap',
