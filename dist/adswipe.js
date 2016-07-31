@@ -1634,6 +1634,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.bg = null;
 	        this.mc = null;
 	        this.adNetworkGestureCapture = null;
+	        this.showingAdNetwork = false;
 
 	        this.start_x = 0;
 	        this.start_y = 0;
@@ -1784,6 +1785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $.ad.style.transition = 'all .5s';
 
 	                if (response.type == 'adNetwork') {
+	                    $.showingAdNetwork = true;
 
 	                    //Create iframe
 	                    var iframe = document.createElement('iframe');
@@ -1810,8 +1812,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    })).recognizeWith(gestureCaptureHammer.get('pan'));
 	                    gestureCaptureHammer.add(new _hammer2['default'].Tap());
 
-	                    gestureCaptureHammer.on("swipeleft swiperight", $.onSwipeGestureCaptureLayer.bind(_this));
-	                    gestureCaptureHammer.on("panleft panright panend", $.onPanGestureCaptureLayer.bind(_this));
+	                    gestureCaptureHammer.on("swipeleft swiperight", $.onSwipe.bind(_this));
+	                    gestureCaptureHammer.on("panleft panright panend", $.onPan.bind(_this));
 	                    gestureCaptureHammer.on("tap", $.onTapGestureCaptureLayer.bind(_this));
 
 	                    //Add debug info to gesture capture layer
@@ -1894,11 +1896,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var x, y;
 	            if (arg === 'swipeleft') {
 	                //$.ad.style.background = '#42d692'; // green
+	                document.body.removeChild($.adNetworkGestureCapture);
 	                x = -$.ad.offsetWidth;
 	                //updateCount('left');
 	            } else if (arg === 'swiperight') {
-	                    console.log('Of-screen');
 	                    //$.ad.style.background = '#d63349'; // red
+	                    document.body.removeChild($.adNetworkGestureCapture);
 	                    x = $.start_x + 10 + $.ad.offsetWidth;
 	                    //    updateCount('right');
 	                } else {
@@ -1945,19 +1948,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var $ = this;
 	            if ($.config.debug) console.log(str);
 	        }
-
-	        /**
-	         * Event handler for gesture capture layer pan events
-	         * It simply removes the gesture capture layer, and passes the event on
-	         */
-	    }, {
-	        key: 'onPanGestureCaptureLayer',
-	        value: function onPanGestureCaptureLayer(ev) {
-	            var $ = this;
-	            //document.body.removeChild($.adNetworkGestureCapture);
-	            console.log($.adNetworkGestureCapture);
-	            $.onPan(ev);
-	        }
 	    }, {
 	        key: 'onPan',
 	        value: function onPan(ev) {
@@ -1979,18 +1969,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            $.requestElementUpdate();
 
 	            $.logEvent(ev.type);
-	        }
-
-	        /**
-	         * Event handler for gesture capture layer swipe events
-	         * It simply removes the gesture capture layer, and passes the event on
-	         */
-	    }, {
-	        key: 'onSwipeGestureCaptureLayer',
-	        value: function onSwipeGestureCaptureLayer(ev) {
-	            var $ = this;
-	            //document.body.removeChild($.adNetworkGestureCapture);
-	            $.onSwipe(ev);
 	        }
 	    }, {
 	        key: 'onSwipe',
@@ -2070,10 +2048,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                'cpu': $.ua.getCPU().architecture,
 	                'user_agent': $.ua.getUA()
 	            };
+
 	            update.post(data).then(function (response) {
 
+	                if ($.showingAdNetwork) return;
+
 	                $.remove(function () {
-	                    if (action === 'tap') window.open($.config.clickURL);
+	                    if (action === 'tap') {
+	                        window.open($.config.clickURL);
+	                    }
 	                });
 	            });
 	        }

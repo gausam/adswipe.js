@@ -13,6 +13,7 @@ class HammerAS {
         this.bg = null;
         this.mc = null;
         this.adNetworkGestureCapture = null;
+        this.showingAdNetwork = false;
 
         this.start_x = 0;
         this.start_y = 0;
@@ -163,6 +164,7 @@ class HammerAS {
             $.ad.style.transition = 'all .5s';
 
             if (response.type == 'adNetwork') {
+                $.showingAdNetwork = true;
 
                 //Create iframe
                 var iframe = document.createElement('iframe');
@@ -189,8 +191,8 @@ class HammerAS {
                 })).recognizeWith(gestureCaptureHammer.get('pan'));
                 gestureCaptureHammer.add(new Hammer.Tap());
 
-                gestureCaptureHammer.on("swipeleft swiperight", $.onSwipeGestureCaptureLayer.bind(this));
-                gestureCaptureHammer.on("panleft panright panend", $.onPanGestureCaptureLayer.bind(this));
+                gestureCaptureHammer.on("swipeleft swiperight", $.onSwipe.bind(this));
+                gestureCaptureHammer.on("panleft panright panend", $.onPan.bind(this));
                 gestureCaptureHammer.on("tap", $.onTapGestureCaptureLayer.bind(this));
 
                 //Add debug info to gesture capture layer
@@ -202,7 +204,7 @@ class HammerAS {
                 $.ad.style.backgroundSize = 'contain';
                 $.ad.style.backgroundPosition = 'center center';
                 $.ad.style.backgroundRepeat = 'no-repeat';
-                
+
             }
 
             $.ad.style.width = $.width + 'px';
@@ -308,7 +310,7 @@ class HammerAS {
             document.body.removeChild($.adNetworkGestureCapture);
             x = -$.ad.offsetWidth;
             //updateCount('left');
-        } else if (arg === 'swiperight') {console.log('Of-screen');
+        } else if (arg === 'swiperight') {
             //$.ad.style.background = '#d63349'; // red
             document.body.removeChild($.adNetworkGestureCapture);
             x = ($.start_x + 10) + $.ad.offsetWidth;
@@ -359,15 +361,6 @@ class HammerAS {
             console.log(str);
     }
 
-    /**
-     * Event handler for gesture capture layer pan events
-     * Simply passes the event on
-     */
-    onPanGestureCaptureLayer(ev) {
-        var $ = this;        
-        $.onPan(ev);
-    }
-
     onPan(ev) {
         var $ = this;
 
@@ -387,15 +380,6 @@ class HammerAS {
         $.requestElementUpdate();
 
         $.logEvent(ev.type);
-    }
-
-    /**
-     * Event handler for gesture capture layer swipe events
-     * Simply passes the event on
-     */
-    onSwipeGestureCaptureLayer(ev) {
-        var $ = this;
-        $.onSwipe(ev);
     }
 
     onSwipe(ev) {
@@ -470,11 +454,15 @@ class HammerAS {
             'cpu': $.ua.getCPU().architecture,
             'user_agent': $.ua.getUA()
         };
+
         update.post(data).then((response) => {
 
+            if ($.showingAdNetwork) return;
+
             $.remove(function(){
-                if( action === 'tap' )
+                if( action === 'tap') {
                     window.open($.config.clickURL);
+                }
             });
         });
     }
