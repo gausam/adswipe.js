@@ -65,6 +65,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.version = version;
 	exports.apiVersion = apiVersion;
 	exports.show = show;
+	exports.tapTimeout = tapTimeout;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -159,6 +160,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	/**
+	 * Set or get gesture capture layer tap timeout
+	 * @return int
+	 */
+
+	function tapTimeout(newTimeout) {
+	    if (util.empty(newTimeout)) {
+	        return config.tapTimeout;
+	    } else {
+	        config.tapTimeout = newTimeout;
+	        return true;
+	    }
+	}
+
+	/**
 	 * Reset ad when orientation changed
 	 */
 	window.onorientationchange = function () {
@@ -197,6 +212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._adID = null;
 	        this._campaignID = null;
 	        this._isShown = false;
+	        this._tapTimeout = 5000;
 	    }
 
 	    _createClass(Config, [{
@@ -277,6 +293,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        set: function set(isShown) {
 	            this._isShown = isShown;
+	        }
+	    }, {
+	        key: 'tapTimeout',
+	        get: function get() {
+	            return this._tapTimeout;
+	        },
+	        set: function set(tapTimeout) {
+	            this._tapTimeout = tapTimeout;
 	        }
 	    }]);
 
@@ -2035,7 +2059,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            //Remove gesture capture layer on tap
 	            $.adNetworkGestureCapture.style.zIndex = -10;
 
-	            $.adNetworkGestureCaptureTimer = setTimeout($.restoreGestureCaptureLayer.bind(this), 5000);
+	            $.adNetworkGestureCaptureTimer = setTimeout($.restoreGestureCaptureLayer.bind(this), $.config.tapTimeout);
 	        }
 	    }, {
 	        key: 'restoreGestureCaptureLayer',

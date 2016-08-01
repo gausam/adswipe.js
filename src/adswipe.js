@@ -75,6 +75,19 @@ export function show(campaignID) {
 }
 
 /**
+ * Set or get gesture capture layer tap timeout
+ * @return int
+ */
+export function tapTimeout(newTimeout) {
+    if( util.empty(newTimeout) ){
+        return config.tapTimeout;
+    } else {
+       config.tapTimeout = newTimeout;
+       return true;
+    }
+}
+
+/**
  * Reset ad when orientation changed
  */
 window.onorientationchange = function() {

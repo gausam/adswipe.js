@@ -443,7 +443,7 @@ class HammerAS {
         //Remove gesture capture layer on tap
         $.adNetworkGestureCapture.style.zIndex = -10;
 
-        $.adNetworkGestureCaptureTimer = setTimeout($.restoreGestureCaptureLayer.bind(this), 5000);
+        $.adNetworkGestureCaptureTimer = setTimeout($.restoreGestureCaptureLayer.bind(this), $.config.tapTimeout);
     }
 
     restoreGestureCaptureLayer() {

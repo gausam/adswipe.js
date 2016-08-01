@@ -13,6 +13,7 @@ class Config {
         this._adID = null;
         this._campaignID = null;
         this._isShown = false;
+        this._tapTimeout = 5000;
     }
 
     get version() { return this._version; }
@@ -44,6 +45,9 @@ class Config {
 
     get isShown() { return this._isShown; }
     set isShown(isShown) { this._isShown = isShown; }
+
+    get tapTimeout() { return this._tapTimeout; }
+    set tapTimeout(tapTimeout) { this._tapTimeout = tapTimeout; }
 }
 
 export default Config;
