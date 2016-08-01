@@ -24,6 +24,15 @@ class HammerAS {
 
         this.ua = new UAParser();
 
+        this.tinderTest = {
+            inRed:          false,
+            inRedColor:     'rgba(200, 0, 0, .5)',
+            inGreen:        false,
+            inGreenColor:   'rgba(0, 200, 0, .5)',
+            inNeutral:      true,
+            inNeutralColor: 'rgba(0, 0, 0, .85)'
+        };
+
         this.setup();
     }
 
@@ -334,6 +343,27 @@ class HammerAS {
 
     updateElementTransform() {
         var $ = this;
+
+        if ($.transform.translate.x < 10 && $.transform.translate.x > -10 && !$.tinderTest.inNeutral) {
+            $.bg.style.backgroundColor = $.tinderTest.inNeutralColor;
+            $.tinderTest.inNeutral = true;
+            $.tinderTest.inRed = false;
+            $.tinderTest.inGreen = false;
+        }
+
+        if ($.transform.translate.x > 10 && !$.tinderTest.inGreen) {
+            $.bg.style.backgroundColor = $.tinderTest.inGreenColor;
+            $.tinderTest.inNeutral = false;
+            $.tinderTest.inRed = false;
+            $.tinderTest.inGreen = true;
+        }
+
+        if ($.transform.translate.x < -10 && !$.tinderTest.inRed) {
+            $.bg.style.backgroundColor = $.tinderTest.inRedColor;
+            $.tinderTest.inNeutral = false;
+            $.tinderTest.inRed = true;
+            $.tinderTest.inGreen = false;
+        }
 
         var value = [
             'translate3d(' + $.transform.translate.x + 'px, ' + $.transform.translate.y + 'px, 0)',
