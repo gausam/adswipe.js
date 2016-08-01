@@ -24,7 +24,7 @@ class HammerAS {
 
         this.ua = new UAParser();
 
-        this.tinderTest = {
+        this.colorFeedback = {
             inRed:          false,
             inRedColor:     'rgba(200, 0, 0, .5)',
             inGreen:        false,
@@ -344,25 +344,25 @@ class HammerAS {
     updateElementTransform() {
         var $ = this;
 
-        if ($.transform.translate.x < 10 && $.transform.translate.x > -10 && !$.tinderTest.inNeutral) {
-            $.bg.style.backgroundColor = $.tinderTest.inNeutralColor;
-            $.tinderTest.inNeutral = true;
-            $.tinderTest.inRed = false;
-            $.tinderTest.inGreen = false;
+        if ($.transform.translate.x < 10 && $.transform.translate.x > -10 && !$.colorFeedback.inNeutral) {
+            $.bg.style.backgroundColor = $.colorFeedback.inNeutralColor;
+            $.colorFeedback.inNeutral = true;
+            $.colorFeedback.inRed = false;
+            $.colorFeedback.inGreen = false;
         }
 
-        if ($.transform.translate.x > 10 && !$.tinderTest.inGreen) {
-            $.bg.style.backgroundColor = $.tinderTest.inGreenColor;
-            $.tinderTest.inNeutral = false;
-            $.tinderTest.inRed = false;
-            $.tinderTest.inGreen = true;
+        if ($.transform.translate.x > 10 && !$.colorFeedback.inGreen) {
+            $.bg.style.backgroundColor = $.colorFeedback.inGreenColor;
+            $.colorFeedback.inNeutral = false;
+            $.colorFeedback.inRed = false;
+            $.colorFeedback.inGreen = true;
         }
 
-        if ($.transform.translate.x < -10 && !$.tinderTest.inRed) {
-            $.bg.style.backgroundColor = $.tinderTest.inRedColor;
-            $.tinderTest.inNeutral = false;
-            $.tinderTest.inRed = true;
-            $.tinderTest.inGreen = false;
+        if ($.transform.translate.x < -10 && !$.colorFeedback.inRed) {
+            $.bg.style.backgroundColor = $.colorFeedback.inRedColor;
+            $.colorFeedback.inNeutral = false;
+            $.colorFeedback.inRed = true;
+            $.colorFeedback.inGreen = false;
         }
 
         var value = [
