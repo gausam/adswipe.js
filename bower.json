@@ -19,6 +19,7 @@
   "devDependencies": {
     "hammerjs": "~2",
     "fingerprintjs2": "~0.5.1",
-    "ua-parser-js": "~0.7.9"
+    "ua-parser-js": "~0.7.9",
+    "js-toast": "ihatehandles/js-toast"
   }
 }

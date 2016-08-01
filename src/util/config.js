@@ -13,7 +13,7 @@ class Config {
         this._adID = null;
         this._campaignID = null;
         this._isShown = false;
-        this._tapTimeout = 5000;
+        this._tapTimeout = 3000;
     }
 
     get version() { return this._version; }

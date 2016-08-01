@@ -3,6 +3,7 @@ import Hammer from 'hammer';
 import Ajax from 'util/ajax.js';
 import UAParser from 'uaparser';
 import Util from 'util/util.js';
+import Toast from 'jstoast';
 
 class HammerAS {
     constructor(config) {
@@ -448,6 +449,7 @@ class HammerAS {
         //Remove gesture capture layer on tap
         $.adNetworkGestureCapture.style.zIndex = -10;
 
+        Toast('Tap to continue or swipe the ad away', { settings: { duration: 2000 } });
         $.adNetworkGestureCaptureTimer = setTimeout($.restoreGestureCaptureLayer.bind(this), $.config.tapTimeout);
     }
 

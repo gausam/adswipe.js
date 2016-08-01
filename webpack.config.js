@@ -12,7 +12,8 @@ module.exports = {
             hammer: resolveBowerPath('/hammerjs/hammer.js'),
             fingerprint2: resolveBowerPath('/fingerprintjs2/fingerprint2.js'),
             //velocity: resolveBowerPath('/velocity/velocity.js')
-            uaparser: resolveBowerPath('/ua-parser-js/src/ua-parser.js')
+            uaparser: resolveBowerPath('/ua-parser-js/src/ua-parser.js'),
+            jstoast: resolveBowerPath('/js-toast/toast.js')
         },
         modulesDirectories: [
             'src',
