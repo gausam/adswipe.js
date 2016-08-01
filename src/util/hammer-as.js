@@ -214,7 +214,7 @@ class HammerAS {
             // make sure this is on top of $.bg   
             $.ad.style.zIndex = $.util.findNextZIndex();
 
-            $.adNetworkGestureCapture.style.zIndex = 10000000;//@todo
+            $.adNetworkGestureCapture.style.zIndex = 10000000;
 
             $.q.style.transition = 'all .5s';
             $.q.style.color = 'rgb(181, 181, 181)';
@@ -412,6 +412,13 @@ class HammerAS {
 
         //Remove gesture capture layer on tap
         $.adNetworkGestureCapture.style.zIndex = -10;
+
+        $.adNetworkGestureCaptureTimer = setTimeout($.restoreGestureCaptureLayer.bind(this), 5000);
+    }
+
+    restoreGestureCaptureLayer() {
+        var $ = this;
+        $.adNetworkGestureCapture.style.zIndex = 10000000;
     }
 
     onTap(ev) {
