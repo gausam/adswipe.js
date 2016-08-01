@@ -122,16 +122,6 @@ class HammerAS {
         $.width = document.documentElement.clientWidth;
         $.height = document.documentElement.clientHeight;
 
-        // add semi-transparent background style to bg element
-        $.bg.style.width = '100%';
-        $.bg.style.height = '100%';
-        $.bg.style.position = 'fixed';
-        $.bg.style.top = 0 + 'px';
-        $.bg.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements, ad will be placed on top of this
-        $.bg.style.backgroundColor = 'rgba(0, 0, 0, .85)';
-        // fade in $.bg
-        $.bg.style.opacity = 1;
-
         // get image, append to hammer element
         var image = new Ajax();
         image.url = $.config.endpoint+`publications`;
@@ -141,6 +131,17 @@ class HammerAS {
         };
         image.getImage().then((response) => {
             // everything is good
+
+            // add semi-transparent background style to bg element
+            $.bg.style.width = '100%';
+            $.bg.style.height = '100%';
+            $.bg.style.position = 'fixed';
+            $.bg.style.top = 0 + 'px';
+            $.bg.style.zIndex = $.util.findNextZIndex(); // make sure this is on top of other elements, ad will be placed on top of this
+            $.bg.style.backgroundColor = 'rgba(0, 0, 0, .85)';
+            // fade in $.bg
+            $.bg.style.opacity = 1;
+
             $.config.clickURL = response.clickURL;
             $.config.adID = response.adID;
             $.config.campaignID = response.campaignID;
@@ -302,9 +303,13 @@ class HammerAS {
 
             // hammerjs
             $.resetElement();
-        }, function(error){
+        }, function(error) {
             $.logEvent('Error: Unable to get image');
             $.logEvent(error);
+
+            //Pull down everything
+            $.remove();
+
             return false;
         });
     }
