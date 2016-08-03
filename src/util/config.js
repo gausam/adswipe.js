@@ -2,7 +2,7 @@
 class Config {
     constructor() {
         this._version = '0.1.4';
-        this._endpoint = 'http://adswipe.com/';
+        this._endpoint = 'http://swiperight.mobi/';
         this._debug = false;
         this._fingerprint = null;
         this._classElement = '_adswipe_'+(Math.random()*1e32).toString(36);
