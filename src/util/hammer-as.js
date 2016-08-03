@@ -268,11 +268,9 @@ class HammerAS {
                                             Swipe Left
                                         </div>
 
-                                        <p>You understand that ads are inevitable, the trade-off for using cool
-                                        software at a reasonable price. By swiping left, you're telling us that you're
-                                        kinda into what the ad was about, but aren't sold enough to click it yet. We
-                                        want to make sure that if you're going to be advertised to, it may as well be
-                                        as useful to you as possible. We'll find something you like!</p>
+                                        <p>You understand that ads are inevitable, swipeleft, you'll tell us no thanks
+                                        or you not longer like the ad.
+                                        </p>
                                     </div>
                                     <div style="margin-bottom: 10px;">
                                         <div style="float: right; margin: 5px 0 0 15px; height: 30px;
@@ -280,9 +278,8 @@ class HammerAS {
                                             Swipe Right
                                         </div>
 
-                                        <p style="text-align: right;">You don't resonate with anything about this ad,
-                                        and you know what? That's okay! We'll try to find something that does, even if
-                                        that means digging through the sofa to find it!</p>
+                                        <p style="text-align: right;">You like the ad, you'll tap to visit when you are ready.
+                                        </p>
                                     </div>
                                 </div>`;
 
